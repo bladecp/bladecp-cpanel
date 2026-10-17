@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a reproducible problem with BladeCP cPanel Migrator.
+title: "Bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve the plugin. Please remove API keys, account names, server addresses, customer data and other sensitive information before submitting.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Explain what you expected to happen instead.
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Enter the released plugin version you are using (WHM, Settings, About this installation).
+    validations:
+      required: true
+  - type: input
+    id: cpanel-version
+    attributes:
+      label: cPanel & WHM version
+      description: Enter your cPanel & WHM version.
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      description: Enter the operating system and version of the server.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant error codes, logs or screenshots
+      description: Add the error code shown by the plugin and sanitized log lines or screenshots that help explain the issue.
+    validations:
+      required: false

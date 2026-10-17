@@ -1,0 +1,753 @@
+/* BladeCP cPanel Migrator interface, direction A2.
+   Converted from the approved design preview (style.css): .bcpm-a2 renamed
+   to .bcpm-app, @font-face emitted by View with same-origin URLs, the
+   discarded trail variant and the preview captions removed. Plugin rules
+   are at the end. Every selector is scoped to .bcpm-app. */
+
+/* ---------- base escopada, resiste ao Bootstrap 3 do WHM ---------- */
+.bcpm-app {
+  --f: "BCPM Inter", Inter, "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  container-type: inline-size;
+  font-family: var(--f);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
+}
+.bcpm-app *, .bcpm-app *::before, .bcpm-app *::after { box-sizing: border-box; }
+.bcpm-app :where(h1, h2, h3, h4, p, ul, ol, dl, dd, figure, fieldset, legend, pre) { margin: 0; padding: 0; }
+.bcpm-app :where(h1, h2, h3, h4) { font-family: inherit; font-size: inherit; font-weight: 600; line-height: 1.25; color: inherit; }
+.bcpm-app :where(label) { display: inline; max-width: none; margin: 0; font-weight: inherit; }
+.bcpm-app :where(table) { width: 100%; border-collapse: collapse; border-spacing: 0; background: transparent; }
+.bcpm-app :where(th) { font-weight: inherit; }
+/* 0,1,1 e 0,2,1: vence o a e o a:hover do Bootstrap */
+.bcpm-app a, .bcpm-app a:hover, .bcpm-app a:focus { color: inherit; text-decoration: none; }
+.bcpm-app :where(input, select, textarea, button) { font: inherit; color: inherit; margin: 0; letter-spacing: inherit; }
+.bcpm-app :where(button) { cursor: pointer; }
+/* o Bootstrap 3 põe input[type=search] em content-box (0,1,1) */
+.bcpm-app input[type=search] { -webkit-appearance: none; appearance: none; box-sizing: border-box; }
+.bcpm-app input[type=search]::-webkit-search-decoration { -webkit-appearance: none; }
+.bcpm-app :where(fieldset) { border: 0; min-width: 0; }
+.bcpm-app :where(legend) { display: block; width: auto; border: 0; font-size: inherit; line-height: inherit; color: inherit; margin: 0; }
+.bcpm-app :where(code) { font-family: var(--mono); font-size: .92em; padding: 0; color: inherit; background: none; border-radius: 0; }
+.bcpm-app :where(pre) { font-family: var(--mono); border: 0; border-radius: 0; background: none; color: inherit; font-size: inherit; }
+.bcpm-app :where(dt) { font-weight: inherit; }
+.bcpm-app :where(dd) { margin-left: 0; }
+.bcpm-app :where(small) { font-size: inherit; }
+.bcpm-app :where(summary) { list-style: none; }
+.bcpm-app :where(summary)::-webkit-details-marker { display: none; }
+.bcpm-app svg { display: block; flex: none; }
+.bcpm-app .m-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.bcpm-app :where(a, button, input, select, summary, label):focus-visible { outline: 3px solid rgb(99 102 241 / .45); outline-offset: 2px; border-radius: 8px; }
+/* ---------- tokens da direção A ---------- */
+.bcpm-app {
+  --ink: #141b2d;
+  --ink-2: #344054;
+  --muted: #5d6879;
+  --faint: #8790a2;
+  --line: #e3e6ee;
+  --line-2: #eef0f5;
+  --page: #f7f8fc;
+  --card: #fff;
+  --chrome: #030712;
+  --brand: #4f46e5;
+  --brand-hover: #4338ca;
+  --brand-500: #6366f1;
+  --violet: #8b5cf6;
+  --brand-soft: #eef0ff;
+  --brand-ink: #3730a3;
+  --shadow: 0 1px 2px rgb(16 24 40 / .04), 0 10px 28px -20px rgb(16 24 40 / .22);
+  position: relative;
+  overflow: clip;
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid #dde1e9;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgb(16 24 40 / .04), 0 30px 60px -44px rgb(16 24 40 / .35);
+}
+.bcpm-app .m-t-success { --tone: #067a52; --tone-soft: #e8f7f0; --tone-line: #bfe6d3; --tone-dot: #12b76a; --tone-rgb: 18 183 106; }
+.bcpm-app .m-t-info { --tone: #4338ca; --tone-soft: #eef0ff; --tone-line: #d6d9fe; --tone-dot: #4f46e5; --tone-rgb: 79 70 229; }
+.bcpm-app .m-t-warning { --tone: #a14a06; --tone-soft: #fff5e6; --tone-line: #f9d8a4; --tone-dot: #f59e0b; --tone-rgb: 245 158 11; }
+.bcpm-app .m-t-danger { --tone: #b42318; --tone-soft: #fef1f0; --tone-line: #f6c7c1; --tone-dot: #f04438; --tone-rgb: 240 68 56; }
+.bcpm-app .m-t-neutral { --tone: #4b5565; --tone-soft: #f2f4f7; --tone-line: #e0e4ea; --tone-dot: #98a2b3; --tone-rgb: 152 162 179; }
+/* ---------- cabeçalho: o Horizonte da marca ---------- */
+/* Planeta escuro: uma elipse de 300% da largura por 122,4% de altura, então
+   a flecha do arco fica em cerca de 3,5% da largura em qualquer tela (--sag).
+   As abas ficam ancoradas na base reta, sobre a superfície do planeta; o aro
+   passa 12px acima delas nas pontas (onde ele desce mais) e o espaço entre o
+   subtítulo e o aro é respiro. A altura total não muda (min-height). */
+@property --bcpm-sweep { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.bcpm-app .m-band {
+  --sag: 3.5cqw;
+  --tabs-h: 42px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(178px + var(--sag));
+  padding: 24px 28px 0;
+  color: #e6e8f2;
+}
+.bcpm-app .m-hz {
+  --rim: calc(100% - var(--tabs-h) - 12px - var(--sag));
+  position: absolute; z-index: -1; inset: 0;
+  overflow: hidden; pointer-events: none;
+  background-color: var(--chrome);
+  background-image:
+    radial-gradient(560px 320px at 0 0, rgb(79 70 229 / .36), transparent 72%),
+    radial-gradient(460px 260px at 100% 0, rgb(139 92 246 / .18), transparent 70%);
+  background-repeat: no-repeat;
+}
+/* a luz que sobe do aro, concentrada no centro */
+.bcpm-app .m-hz-atmo {
+  position: absolute; left: 0; right: 0; top: calc(var(--rim) - 300px); height: 600px;
+  background: radial-gradient(44% 300px at 50% 300px, rgb(99 102 241 / .42), rgb(139 92 246 / .1) 45%, transparent 72%);
+  animation: bcpm-atmo 9s ease-in-out infinite;
+}
+/* a superfície escura do planeta */
+.bcpm-app .m-hz-planet {
+  position: absolute; top: var(--rim); left: 50%; width: 300%; height: 122.4cqw; border-radius: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #05060f, #000 90px);
+}
+/* o aro: linha fina e clara com brilho índigo, mais forte no centro e
+   sumindo nas pontas (a máscara horizontal vale para a linha e o brilho) */
+.bcpm-app .m-hz-rimwrap {
+  position: absolute; inset: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / .45) 16%, #000 40%, #000 60%, rgb(0 0 0 / .45) 84%, transparent);
+  mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / .45) 16%, #000 40%, #000 60%, rgb(0 0 0 / .45) 84%, transparent);
+}
+.bcpm-app .m-hz-rim {
+  position: absolute; top: var(--rim); left: 50%; width: 300%; height: 122.4cqw; border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 1.5px 0 rgb(255 255 255 / .85),
+    inset 0 22px 46px -24px rgb(99 102 241 / .55),
+    0 -1px 12px rgb(99 102 241 / .8),
+    0 -28px 96px -12px rgb(99 102 241 / .5);
+}
+/* o brilho que corre pelo aro */
+.bcpm-app .m-hz-rim::before {
+  content: ""; position: absolute; inset: -1px; padding: 2px; border-radius: 50%;
+  background: conic-gradient(from var(--bcpm-sweep), rgb(255 255 255 / .95) 0deg, rgb(99 102 241 / .75) 2.5deg, transparent 8deg, transparent 352deg, rgb(99 102 241 / .75) 357.5deg, rgb(255 255 255 / .95) 360deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  animation: bcpm-rim 14s ease-in-out infinite alternate;
+}
+.bcpm-app .m-hz-sun {
+  position: absolute; top: var(--rim); left: 50%; width: 520px; height: 60px; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 50%, rgb(255 255 255 / .75), rgb(99 102 241 / .45) 30%, transparent 70%);
+  filter: blur(10px); mix-blend-mode: screen; transform: translate(-50%, -50%);
+}
+@keyframes bcpm-rim { from { --bcpm-sweep: -44deg; } to { --bcpm-sweep: 44deg; } }
+@keyframes bcpm-atmo { 50% { opacity: .8; } }
+.bcpm-app .m-band-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
+.bcpm-app .m-brand { display: inline-flex; align-items: center; gap: 12px; color: #fff; }
+.bcpm-app .m-logo { height: 22px; width: auto; color: #fff; }
+.bcpm-app .m-brand-sep { width: 1px; height: 18px; background: rgb(255 255 255 / .22); }
+.bcpm-app .m-brand-name { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: rgb(255 255 255 / .92); }
+.bcpm-app .m-conn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 13px 6px 11px; border-radius: 999px;
+  background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1);
+  font-size: 12.5px; color: #b9bfd3; transition: background-color .15s, border-color .15s;
+}
+.bcpm-app .m-conn:hover { background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .18); color: #fff; }
+.bcpm-app .m-conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 3px rgb(52 211 153 / .18); }
+.bcpm-app .m-conn-mail { color: #fff; font-weight: 500; }
+.bcpm-app .m-tagline { margin: 8px 0 0; font-size: 13px; color: #9aa2b8; }
+/* abas ancoradas na base reta, como na A */
+.bcpm-app .m-tabs {
+  display: flex; align-items: flex-end; gap: 4px;
+  margin-top: auto; padding-top: calc(var(--sag) + 40px);
+  overflow-x: auto; scrollbar-width: none;
+}
+.bcpm-app .m-tabs::-webkit-scrollbar { display: none; }
+.bcpm-app .m-tabs a {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  height: var(--tabs-h); padding: 0 15px 2px; border-radius: 10px 10px 0 0;
+  font-size: 13.5px; font-weight: 500; color: #aeb5c8; white-space: nowrap;
+  transition: background-color .15s, color .15s;
+}
+.bcpm-app .m-tabs a svg { width: 16px; height: 16px; color: var(--brand-500); }
+.bcpm-app .m-tabs a:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.bcpm-app .m-tabs a[aria-current] {
+  color: #fff;
+  background: linear-gradient(180deg, rgb(79 70 229 / .36), rgb(79 70 229 / .08));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), inset 1px 0 0 rgb(99 102 241 / .35), inset -1px 0 0 rgb(99 102 241 / .35);
+}
+.bcpm-app .m-tabs a[aria-current] svg { color: #fff; }
+.bcpm-app .m-tabs a[aria-current]::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand-500), var(--violet));
+  box-shadow: 0 0 12px rgb(99 102 241 / .9);
+}
+.bcpm-app .m-tab-n {
+  display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px;
+  border-radius: 999px; background: #f59e0b; color: #241400; font-size: 11px; font-weight: 700;
+}
+/* ---------- folha clara com aurora, topo reto ---------- */
+.bcpm-app .m-sheet {
+  padding: 28px 28px 32px;
+  background-color: var(--page);
+  background-image:
+    radial-gradient(55% 300px at 0 0, rgb(79 70 229 / .09), transparent 70%),
+    radial-gradient(45% 260px at 100% 0, rgb(139 92 246 / .07), transparent 70%);
+  background-repeat: no-repeat;
+}
+.bcpm-app .m-foot { display: flex; align-items: center; gap: 8px; padding: 14px 28px 18px; border-top: 1px solid var(--line-2); font-size: 12px; color: var(--faint); }
+.bcpm-app .m-foot .m-mark { width: 17px; height: auto; }
+.bcpm-app .m-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 22px; }
+.bcpm-app .m-h1 { font-size: 26px; font-weight: 700; letter-spacing: -.022em; line-height: 1.15; color: var(--ink); }
+.bcpm-app .m-sub { margin-top: 6px; max-width: 660px; font-size: 13.5px; color: var(--muted); }
+.bcpm-app .m-head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bcpm-app .m-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 13px; font-weight: 500; color: var(--brand); }
+.bcpm-app .m-back svg { width: 15px; height: 15px; }
+.bcpm-app .m-back:hover { color: var(--brand-hover); }
+.bcpm-app .m-hint { display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; max-width: 760px; font-size: 12.5px; color: var(--muted); }
+.bcpm-app .m-hint svg { width: 15px; height: 15px; margin-top: 2px; color: var(--brand-500); }
+.bcpm-app .m-faint { color: var(--faint); }
+.bcpm-app .m-dash { color: #b3bac7; }
+.bcpm-app .m-mono { font-family: var(--mono); font-size: 13px; }
+/* ---------- botões ---------- */
+.bcpm-app .m-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 38px; padding: 8px 14px; border-radius: 10px;
+  border: 1px solid #d8dbe7; background: #fff; color: var(--ink-2);
+  font-size: 13.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; text-decoration: none; cursor: pointer;
+  box-shadow: 0 1px 2px rgb(16 24 40 / .05);
+  transition: background-color .15s, border-color .15s, box-shadow .15s, color .15s;
+}
+.bcpm-app .m-btn svg { width: 16px; height: 16px; }
+.bcpm-app .m-btn:hover { background: #f7f7fe; border-color: #c4c7ea; color: var(--brand-ink); text-decoration: none; }
+.bcpm-app .m-btn.m-primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / .16), 0 1px 2px rgb(16 24 40 / .1); }
+.bcpm-app .m-btn.m-primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); color: #fff; box-shadow: 0 8px 18px -8px rgb(79 70 229 / .6); }
+.bcpm-app .m-btn.m-accent { color: var(--brand-ink); border-color: #d6d9fe; background: var(--brand-soft); box-shadow: none; }
+.bcpm-app .m-btn.m-accent:hover { background: #e3e6ff; border-color: #c2c7fb; }
+.bcpm-app .m-btn.m-danger { color: #b42318; background: transparent; border-color: transparent; box-shadow: none; }
+.bcpm-app .m-btn.m-danger:hover { background: #fef1f0; border-color: #f6c7c1; color: #912018; }
+.bcpm-app .m-btn.m-sm { min-height: 32px; padding: 5px 11px; border-radius: 8px; font-size: 13px; }
+.bcpm-app .m-btn.m-sm svg { width: 15px; height: 15px; }
+.bcpm-app .m-btn.m-lg { min-height: 46px; padding: 11px 20px; font-size: 14.5px; border-radius: 12px; }
+.bcpm-app .m-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.bcpm-app .m-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--brand); white-space: nowrap; }
+.bcpm-app .m-link svg { width: 14px; height: 14px; }
+.bcpm-app .m-link:hover { color: var(--brand-hover); text-decoration: underline; text-underline-offset: 3px; }
+/* ---------- cartões de resumo ---------- */
+.bcpm-app .m-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.bcpm-app .m-stat {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 12px;
+  padding: 15px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card);
+  color: var(--ink); box-shadow: var(--shadow); transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.bcpm-app .m-stat:hover { border-color: var(--tone-line); box-shadow: 0 12px 26px -18px var(--tone); transform: translateY(-1px); }
+.bcpm-app .m-stat-ic { grid-row: 1 / 4; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: var(--tone-soft); color: var(--tone); }
+.bcpm-app .m-stat-ic svg { width: 19px; height: 19px; }
+.bcpm-app .m-stat-n { font-size: 23px; font-weight: 700; line-height: 1.05; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.bcpm-app .m-stat-l { margin-top: 2px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.bcpm-app .m-stat-s { font-size: 12px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ---------- cartões e tabela ---------- */
+.bcpm-app .m-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+.bcpm-app .m-flush { overflow: hidden; }
+.bcpm-app .m-table-wrap { overflow-x: auto; }
+.bcpm-app .m-table { font-size: 13.5px; }
+.bcpm-app .m-table th {
+  padding: 11px 14px; text-align: left; white-space: nowrap;
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  background: #fafbfd; border-bottom: 1px solid var(--line);
+}
+.bcpm-app .m-table td { padding: 15px 14px; vertical-align: top; border-bottom: 1px solid var(--line-2); color: var(--ink-2); }
+.bcpm-app .m-table tbody tr:last-child td { border-bottom: 0; }
+.bcpm-app .m-table tbody tr:hover td { background: #fbfbff; }
+.bcpm-app .m-jobs tr.m-needs td:first-child { box-shadow: inset 3px 0 0 var(--tone); }
+.bcpm-app .m-acct { display: flex; align-items: flex-start; gap: 12px; }
+.bcpm-app .m-avatar { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--brand-soft); color: var(--brand); font-size: 13px; font-weight: 700; }
+.bcpm-app .m-acct strong, .bcpm-app .m-cell-user strong { display: block; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-dom { display: block; font-size: 13px; color: var(--ink-2); }
+.bcpm-app .m-when { display: block; margin-top: 2px; font-size: 12px; color: var(--faint); white-space: nowrap; }
+.bcpm-app .m-detail { margin-top: 7px; max-width: 290px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.bcpm-app .m-pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 13px;
+  border: 1px solid var(--tone-line); background: var(--tone-soft); color: var(--tone);
+  font-size: 12.5px; font-weight: 600; line-height: 1.4;
+}
+.bcpm-app .m-pill-ic { width: 14px; height: 14px; }
+.bcpm-app .m-spin { animation: bcpm-spin 1.4s linear infinite; }
+@keyframes bcpm-spin { to { transform: rotate(360deg); } }
+.bcpm-app .m-progress { display: flex; align-items: center; gap: 10px; min-width: 120px; padding-top: 6px; }
+.bcpm-app .m-bar { flex: 1; max-width: 120px; height: 6px; overflow: hidden; border-radius: 999px; background: #eaecf3; }
+.bcpm-app .m-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--brand), var(--violet)); }
+.bcpm-app .m-progress.m-t-success .m-bar span { background: #12a26e; }
+.bcpm-app .m-pct { min-width: 34px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bcpm-app .m-progress.m-t-danger .m-pct { color: #b42318; }
+.bcpm-app .m-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 180px; }
+.bcpm-app .m-inline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.bcpm-app .m-domain .m-input { width: 196px; }
+.bcpm-app .m-err { flex-basis: 100%; }
+.bcpm-app .m-err summary { display: inline-flex; align-items: center; gap: 6px; padding: 4px 2px; cursor: pointer; font-size: 13px; font-weight: 600; color: #b42318; }
+.bcpm-app .m-err summary svg { width: 15px; height: 15px; }
+.bcpm-app .m-chev { transition: transform .15s; }
+.bcpm-app details[open] > summary .m-chev { transform: rotate(180deg); }
+.bcpm-app .m-err-body { margin-top: 6px; max-width: 430px; padding: 12px 14px; border: 1px solid #f6c7c1; border-radius: 10px; background: #fef6f5; font-size: 12.5px; color: #5c1a12; }
+.bcpm-app .m-err-body dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin-top: 10px; }
+.bcpm-app .m-err-body dt { color: #912018; font-weight: 500; }
+.bcpm-app .m-err-body dd { overflow-wrap: anywhere; }
+.bcpm-app .m-err-body code { padding: 1px 6px; border: 1px solid #f6c7c1; border-radius: 5px; background: #fff; color: #7a1a12; font-size: 12px; }
+.bcpm-app .m-err-body pre { margin-top: 10px; padding: 9px 11px; border: 1px solid #f6c7c1; border-radius: 8px; background: #fff; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; color: #3d1410; }
+/* ---------- avisos ---------- */
+.bcpm-app .m-notice { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; padding: 13px 16px; border: 1px solid var(--tone-line); border-radius: 12px; background: var(--tone-soft); font-size: 13.5px; color: var(--ink-2); }
+.bcpm-app .m-notice > svg { width: 18px; height: 18px; margin-top: 1px; color: var(--tone); }
+.bcpm-app .m-notice code { padding: 1px 6px; border-radius: 5px; background: rgb(255 255 255 / .7); border: 1px solid var(--tone-line); font-size: 12.5px; }
+.bcpm-app .m-notice a { color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+/* ---------- formulários ---------- */
+.bcpm-app .m-input, .bcpm-app .m-select select {
+  display: block; width: 100%; min-height: 40px; padding: 8px 12px;
+  border: 1px solid #d4d8e3; border-radius: 10px; background: #fff; color: var(--ink);
+  font-size: 14px; line-height: 1.35; box-shadow: 0 1px 2px rgb(16 24 40 / .04);
+  transition: border-color .15s, box-shadow .15s;
+}
+.bcpm-app .m-input::placeholder { color: #98a1b2; }
+.bcpm-app .m-input:hover, .bcpm-app .m-select select:hover { border-color: #b9bed0; }
+.bcpm-app .m-input:focus, .bcpm-app .m-select select:focus { outline: none; border-color: var(--brand-500); box-shadow: 0 0 0 4px rgb(99 102 241 / .16); }
+.bcpm-app .m-input[aria-invalid=true] { border-color: #f04438; box-shadow: 0 0 0 4px rgb(240 68 56 / .1); }
+.bcpm-app .m-input-sm { min-height: 34px; padding: 6px 10px; font-size: 13px; border-radius: 8px; }
+.bcpm-app .m-select { position: relative; }
+.bcpm-app .m-select select { -webkit-appearance: none; appearance: none; padding-right: 38px; cursor: pointer; }
+.bcpm-app .m-select svg { position: absolute; top: 50%; right: 12px; width: 16px; height: 16px; margin-top: -8px; color: var(--faint); pointer-events: none; }
+.bcpm-app .m-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.bcpm-app .m-field > label, .bcpm-app .m-legend { font-size: 13px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-legend { margin-bottom: 10px; }
+.bcpm-app .m-narrow { max-width: 420px; }
+.bcpm-app .m-help { font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.bcpm-app .m-ferr { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12.5px; font-weight: 500; color: #b42318; }
+.bcpm-app .m-ferr svg { width: 14px; height: 14px; }
+.bcpm-app .m-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.bcpm-app .m-fieldset { margin-bottom: 20px; }
+.bcpm-app .m-keywrap { position: relative; }
+.bcpm-app .m-keywrap svg { position: absolute; top: 50%; left: 12px; width: 16px; height: 16px; margin-top: -8px; color: var(--brand-500); }
+.bcpm-app .m-keywrap .m-input { padding-left: 38px; }
+.bcpm-app .m-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.bcpm-app .m-note { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--muted); }
+.bcpm-app .m-note svg { width: 15px; height: 15px; margin-top: 2px; color: var(--brand-500); }
+/* escolhas em cartão */
+.bcpm-app .m-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.bcpm-app .m-choices.m-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bcpm-app .m-choice {
+  position: relative; display: flex; flex-direction: column; gap: 10px;
+  padding: 15px 15px 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.bcpm-app .m-choice:hover { border-color: #c9cdf0; }
+.bcpm-app .m-choice:has(.m-radio:checked) { border-color: var(--brand-500); background: linear-gradient(180deg, #f6f6ff, #fff 70%); box-shadow: 0 0 0 3px rgb(99 102 241 / .14); }
+.bcpm-app .m-choice:has(.m-radio:focus-visible) { outline: 3px solid rgb(99 102 241 / .45); outline-offset: 2px; }
+.bcpm-app .m-choice-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--brand-soft); color: var(--brand); }
+.bcpm-app .m-choice-ic svg { width: 17px; height: 17px; }
+.bcpm-app .m-choice-body { display: flex; flex-direction: column; gap: 4px; }
+.bcpm-app .m-choice strong { padding-right: 24px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-radio {
+  position: absolute; top: 15px; right: 15px; width: 18px; height: 18px; margin: 0;
+  -webkit-appearance: none; appearance: none; border: 1.5px solid #c3c8d4; border-radius: 50%; background: #fff; cursor: pointer;
+  transition: border-color .15s, border-width .15s;
+}
+.bcpm-app .m-radio:checked { border: 5px solid var(--brand); }
+.bcpm-app .m-radio:focus { outline: none; }
+.bcpm-app .m-days { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+.bcpm-app .m-days .m-input { width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+/* caixas de seleção */
+.bcpm-app .m-check {
+  -webkit-appearance: none; appearance: none; display: block; width: 18px; height: 18px; margin: 1px 0 0;
+  border: 1.5px solid #c3c8d4; border-radius: 5px; background: #fff center / 12px 12px no-repeat; cursor: pointer;
+  transition: background-color .12s, border-color .12s;
+}
+.bcpm-app .m-check:checked { border-color: var(--brand); background-color: var(--brand); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+.bcpm-app .m-check:disabled { background-color: #f2f4f7; border-color: #e0e4ea; cursor: not-allowed; }
+/* ---------- contas ---------- */
+.bcpm-app .m-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 14px 16px; border-bottom: 1px solid var(--line); background: #fff; }
+.bcpm-app .m-search { position: relative; flex: 1 1 240px; max-width: 360px; }
+.bcpm-app .m-search svg { position: absolute; top: 50%; left: 12px; width: 16px; height: 16px; margin-top: -8px; color: var(--faint); }
+.bcpm-app .m-search .m-input { padding-left: 38px; }
+.bcpm-app .m-selected { display: inline-flex; flex-direction: column; margin-left: auto; font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; text-align: right; }
+.bcpm-app .m-selected .m-faint { font-size: 12px; font-weight: 400; }
+.bcpm-app .m-check-cell { width: 48px; padding-right: 0 !important; }
+.bcpm-app .m-num { text-align: right !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bcpm-app .m-accounts td { padding-top: 13px; padding-bottom: 13px; vertical-align: middle; }
+.bcpm-app .m-accounts tr.is-picked td { background: #f6f6ff; }
+.bcpm-app .m-accounts tr.is-picked td:first-child { box-shadow: inset 3px 0 0 var(--brand-500); }
+.bcpm-app .m-accounts tr.is-busy td { color: var(--faint); }
+.bcpm-app .m-accounts tr.is-busy strong { color: var(--muted); }
+/* ---------- seções com ícone (revisão e configurações) ---------- */
+.bcpm-app .m-sec { margin-bottom: 18px; }
+.bcpm-app .m-sec-head { display: flex; align-items: flex-start; gap: 14px; padding: 18px 22px; border-bottom: 1px solid var(--line-2); }
+.bcpm-app .m-tile { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 11px; background: var(--brand-soft); color: var(--brand); box-shadow: inset 0 0 0 1px #dfe2ff; }
+.bcpm-app .m-tile svg { width: 19px; height: 19px; }
+.bcpm-app .m-sec-head h2 { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+.bcpm-app .m-sec-head p { margin-top: 3px; font-size: 13px; color: var(--muted); }
+.bcpm-app .m-sec-body { padding: 20px 22px 22px; }
+.bcpm-app .m-flush-body .m-sec-body { padding: 0; }
+.bcpm-app .m-review td { vertical-align: top; }
+.bcpm-app .m-review .m-input { min-width: 170px; }
+.bcpm-app .m-review tr.has-error td { background: #fffafa; }
+.bcpm-app .m-review tr.has-error td:first-child { box-shadow: inset 3px 0 0 #f04438; }
+.bcpm-app .m-submit { display: flex; justify-content: flex-end; margin-top: 18px; }
+.bcpm-app .m-settings { max-width: 980px; }
+.bcpm-app .m-group { padding: 22px 0; border-top: 1px solid var(--line-2); }
+.bcpm-app .m-group:first-child { padding-top: 0; border-top: 0; }
+.bcpm-app .m-group h3 { margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-group > .m-field:last-child, .bcpm-app .m-group > .m-fieldset:last-child, .bcpm-app .m-group > .m-grid-2:last-child .m-field { margin-bottom: 0; }
+.bcpm-app .m-group + .m-form-actions { padding-top: 20px; border-top: 1px solid var(--line-2); margin-top: 0; }
+.bcpm-app .m-conn-status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 20px; padding: 12px 14px; border-radius: 12px; background: #fafbfd; border: 1px solid var(--line-2); }
+.bcpm-app .m-conn-status p { font-size: 13px; color: var(--ink-2); }
+.bcpm-app .m-adv { margin: -4px 0 16px; }
+.bcpm-app .m-adv summary { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); }
+.bcpm-app .m-adv summary svg { width: 15px; height: 15px; }
+.bcpm-app .m-adv summary:hover { color: var(--brand); }
+.bcpm-app .m-adv-body { margin-top: 12px; padding: 16px 16px 2px; border-radius: 12px; background: #fafbfd; border: 1px solid var(--line-2); }
+.bcpm-app .m-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }
+.bcpm-app .m-facts dt { font-size: 12px; color: var(--faint); }
+.bcpm-app .m-facts dd { margin-top: 3px; font-size: 13.5px; font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+.bcpm-app .m-facts code { font-size: 12.5px; }
+/* ---------- estados vazios ---------- */
+.bcpm-app .m-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 20px 36px; text-align: center; margin-bottom: 8px; }
+.bcpm-app .m-empty h2 { margin-top: 6px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.bcpm-app .m-empty p { max-width: 420px; font-size: 13.5px; color: var(--muted); }
+.bcpm-app .m-empty .m-btn { margin-top: 8px; }
+.bcpm-app .m-empty-art { display: flex; align-items: center; gap: 0; }
+.bcpm-app .m-empty-node { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 15px; background: #fff; border: 1px solid var(--line); color: var(--muted); box-shadow: var(--shadow); }
+.bcpm-app .m-empty-node svg { width: 22px; height: 22px; }
+.bcpm-app .m-empty-brand { background: var(--chrome); border-color: var(--chrome); background-image: radial-gradient(60px 50px at 0 0, rgb(79 70 229 / .55), transparent 75%); }
+.bcpm-app .m-empty-brand .m-mark { width: 26px; height: auto; }
+.bcpm-app .m-empty-key { color: var(--brand); background: var(--brand-soft); border-color: #dfe2ff; }
+.bcpm-app .m-empty-line { width: 72px; height: 2px; background: repeating-linear-gradient(90deg, var(--brand-500) 0 6px, transparent 6px 11px); opacity: .6; }
+/* ---------- progresso: barra de luz em 6 segmentos (o DNS nunca é etapa) ---------- */
+.bcpm-app .m-sprog { width: 156px; padding-top: 3px; }
+.bcpm-app .m-sprog-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+.bcpm-app .m-sprog-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.bcpm-app .m-sprog.m-t-warning .m-sprog-name, .bcpm-app .m-sprog.m-t-danger .m-sprog-name, .bcpm-app .m-sprog.m-t-success .m-sprog-name { color: var(--tone); }
+.bcpm-app .m-sprog .m-pct { min-width: 0; font-size: 12px; font-weight: 600; color: var(--faint); font-variant-numeric: tabular-nums; }
+.bcpm-app .m-segs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; }
+.bcpm-app .m-segs i { display: block; height: 6px; border-radius: 3px; background: #e7e9f1; }
+.bcpm-app .m-segs i.is-done { background: linear-gradient(90deg, var(--brand), var(--brand-500)); }
+.bcpm-app .m-segs i.is-now { background: var(--tone-dot); box-shadow: 0 0 0 3px rgb(var(--tone-rgb) / .16), 0 0 10px rgb(var(--tone-rgb) / .45); }
+.bcpm-app .m-sprog.is-live .m-segs i { background: #12b76a; box-shadow: none; }
+/* ---------- responsivo por contêiner ---------- */
+.bcpm-app .m-wrap { overflow-wrap: anywhere; }
+@container (max-width: 1100px) {
+  .bcpm-app .m-avatar { display: none; }
+  .bcpm-app .m-table th, .bcpm-app .m-table td { padding-left: 11px; padding-right: 11px; }
+  .bcpm-app .m-actions { min-width: 160px; }
+}
+@container (max-width: 980px) {
+  .bcpm-app .m-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bcpm-app .m-choices { grid-template-columns: minmax(0, 1fr); }
+}
+@container (max-width: 860px) {
+  .bcpm-app .m-band { --tabs-h: 40px; min-height: calc(135px + var(--sag)); padding: 18px 16px 0; }
+  .bcpm-app .m-sheet { padding: 20px 14px 24px; }
+  .bcpm-app .m-foot { padding: 12px 16px 14px; }
+  .bcpm-app .m-tagline { display: none; }
+  .bcpm-app .m-tabs { padding-top: calc(var(--sag) + 30px); }
+  .bcpm-app .m-conn-mail { display: none; }
+  .bcpm-app .m-tabs a { padding: 0 12px 2px; }
+  .bcpm-app .m-sprog { width: 100%; max-width: 280px; }
+  .bcpm-app .m-h1 { font-size: 22px; }
+  .bcpm-app .m-grid-2, .bcpm-app .m-choices.m-two, .bcpm-app .m-facts { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app .m-sec-head { padding: 16px; }
+  .bcpm-app .m-sec-body { padding: 16px; }
+  .bcpm-app .m-stat-s { display: none; }
+  /* tabelas viram listas de cartões */
+  .bcpm-app .m-table thead { display: none; }
+  .bcpm-app .m-table, .bcpm-app .m-table tbody, .bcpm-app .m-table tr, .bcpm-app .m-table td { display: block; width: 100%; }
+  .bcpm-app .m-table tr { position: relative; padding: 14px 16px; border-bottom: 1px solid var(--line-2); }
+  .bcpm-app .m-table tbody tr:last-child { border-bottom: 0; }
+  .bcpm-app .m-table td { padding: 5px 0; border: 0; background: transparent !important; box-shadow: none !important; }
+  .bcpm-app .m-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font-size: 11.5px; font-weight: 500; color: var(--faint); }
+  .bcpm-app .m-table td.m-cell-user::before { display: none; }
+  .bcpm-app .m-jobs tr.m-needs { box-shadow: inset 3px 0 0 var(--tone); }
+  .bcpm-app .m-accounts tr.is-picked { background: #f6f6ff; box-shadow: inset 3px 0 0 var(--brand-500); }
+  .bcpm-app .m-accounts tr { padding-left: 50px; }
+  .bcpm-app .m-accounts td.m-check-cell { position: absolute; top: 16px; left: 16px; width: auto; padding: 0; }
+  .bcpm-app .m-accounts thead { display: none; }
+  .bcpm-app .m-num { text-align: left !important; }
+  .bcpm-app .m-actions { min-width: 0; }
+  .bcpm-app .m-domain { flex-wrap: wrap; }
+  .bcpm-app .m-review .m-input { min-width: 0; }
+  .bcpm-app .m-selected { margin-left: 0; text-align: left; }
+  .bcpm-app .m-toolbar .m-btn { width: 100%; }
+  .bcpm-app .m-submit .m-btn { width: 100%; }
+}
+@container (max-width: 460px) {
+  .bcpm-app .m-stats { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app .m-brand-sep, .bcpm-app .m-brand-name { display: none; }
+  .bcpm-app .m-tabs a svg { display: none; }
+  .bcpm-app .m-tabs a { padding: 0 10px 2px; }
+  .bcpm-app .m-hz-sun { width: 300px; height: 40px; }
+  .bcpm-app .m-head-actions, .bcpm-app .m-head-actions .m-btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bcpm-app .m-spin, .bcpm-app .m-hz-planet::before, .bcpm-app .m-hz-atmo { animation: none; }
+  .bcpm-app * { transition: none !important; }
+}
+
+/* ---------- plugin: rules that the design preview does not need ---------- */
+/* Active summary card: the list below is filtered by it. */
+.bcpm-app .m-stat[aria-current] { border-color: var(--tone-line); box-shadow: 0 0 0 3px rgb(var(--tone-rgb) / .16), var(--shadow); }
+.bcpm-app .m-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: -4px 0 14px; font-size: 13px; color: var(--muted); }
+.bcpm-app .m-filter strong { color: var(--ink); font-weight: 600; }
+.bcpm-app .m-filter-empty { padding: 28px 20px; text-align: center; font-size: 13.5px; color: var(--muted); }
+/* Without a percentage the progress shows "step k of 7". */
+.bcpm-app .m-sprog .m-pct { white-space: nowrap; }
+/* Message pages (access denied, expired form, installation incomplete). */
+.bcpm-app .m-empty h1 { margin-top: 6px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.bcpm-app .m-empty-alert { color: #b42318; background: #fef1f0; border-color: #f6c7c1; }
+/* Connection pill in the brand band when the key is missing or the last test failed. */
+.bcpm-app .m-conn-dot.is-off { background: #f87171; box-shadow: 0 0 0 3px rgb(248 113 113 / .2); }
+/* The sweep now runs on the rim (.m-hz-rim::before); stop it too when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .bcpm-app .m-hz-rim::before { animation: none; }
+}
+/* Result of the last action: a stripe in the tone color, medium text and a subtle entrance. */
+.bcpm-app .m-flash { padding-left: 18px; box-shadow: inset 4px 0 0 var(--tone-dot), 0 12px 26px -20px rgb(var(--tone-rgb) / .85); animation: bcpm-flash-in .32s cubic-bezier(.2, .7, .2, 1) both; }
+.bcpm-app .m-flash p { font-weight: 500; color: var(--ink); }
+@keyframes bcpm-flash-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+/* A submit button keeps its colors while its request runs. */
+.bcpm-app .m-btn[aria-busy=true], .bcpm-app .m-btn[aria-busy=true]:disabled { opacity: 1; cursor: progress; }
+@media (prefers-reduced-motion: reduce) {
+  .bcpm-app .m-flash { animation: none; }
+}
+/* WHM home page Favorites: a quiet card on the Migrations page, until pinned or "Not now". */
+.bcpm-app .m-pin { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-bottom: 18px; padding: 14px 16px; }
+.bcpm-app .m-pin-copy { flex: 1 1 300px; min-width: 0; }
+.bcpm-app .m-pin-copy h2 { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.bcpm-app .m-pin-copy p { margin-top: 2px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.bcpm-app .m-pin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+/* Settings: where BladeCP shows up (WHM Favorites, cPanel banner). */
+.bcpm-app .m-opts { display: grid; }
+.bcpm-app .m-opt { display: flex; align-items: flex-start; gap: 14px; padding: 16px 0; border-top: 1px solid var(--line-2); }
+.bcpm-app .m-opt:first-child { padding-top: 0; border-top: 0; }
+.bcpm-app .m-opt:last-child { padding-bottom: 0; }
+.bcpm-app .m-opt-ic { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--brand-soft); color: var(--brand); }
+.bcpm-app .m-opt-ic svg { width: 17px; height: 17px; }
+.bcpm-app .m-opt-body { flex: 1; min-width: 0; }
+.bcpm-app .m-opt-body h3 { font-size: 14px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-opt-body > .m-help { max-width: 640px; margin-top: 3px; }
+.bcpm-app .m-opt-state { margin-top: 10px; }
+.bcpm-app .m-opt-body .m-notice { margin: 12px 0 10px; }
+.bcpm-app .m-opt-action { flex: none; }
+/* On and off: a submit button with role=switch. */
+.bcpm-app .m-switch { display: inline-flex; align-items: center; gap: 10px; min-height: 38px; padding: 4px; border: 0; border-radius: 10px; background: none; color: var(--ink-2); font-size: 13.5px; font-weight: 600; line-height: 1.2; cursor: pointer; }
+.bcpm-app .m-switch svg { width: 16px; height: 16px; }
+.bcpm-app .m-switch-track { position: relative; flex: none; width: 40px; height: 24px; border-radius: 999px; background: #d0d5dd; transition: background-color .15s; }
+.bcpm-app .m-switch-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(16 24 40 / .22); transition: transform .15s; }
+.bcpm-app .m-switch[aria-checked=true] .m-switch-track { background: var(--brand); }
+.bcpm-app .m-switch[aria-checked=true] .m-switch-thumb { transform: translateX(16px); }
+.bcpm-app .m-switch:hover .m-switch-track { box-shadow: 0 0 0 4px rgb(99 102 241 / .12); }
+.bcpm-app .m-switch[aria-busy=true] { cursor: progress; }
+@media (prefers-reduced-motion: reduce) {
+  .bcpm-app .m-switch-track, .bcpm-app .m-switch-thumb { transition: none; }
+}
+@container (max-width: 860px) {
+  .bcpm-app .m-opt { flex-wrap: wrap; }
+  .bcpm-app .m-opt-action { flex-basis: 100%; padding-left: 48px; }
+  .bcpm-app .m-pin-actions, .bcpm-app .m-pin-actions .m-inline, .bcpm-app .m-pin-actions .m-btn { width: 100%; }
+}
+
+/* ---------- cPanel app: the account side, in the same A2 language ---------- */
+.bcpm-app .m-chip { min-width: 0; max-width: 100%; cursor: default; }
+.bcpm-app .m-chip:hover { background: rgb(255 255 255 / .06); border-color: rgb(255 255 255 / .1); color: #b9bfd3; }
+.bcpm-app .m-chip-domain { min-width: 0; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff; font-weight: 500; }
+/* The hosting partner, as a reference next to the account domain. */
+.bcpm-app .m-band-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.bcpm-app .m-partner-l { color: #9aa2b8; }
+.bcpm-app .m-route-mark { width: 22px; height: auto; }
+.bcpm-app .m-foot > .m-mark { width: 17px; height: auto; }
+.bcpm-app .m-point-card .m-ns { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 640px; }
+.bcpm-app .m-point-card .m-point-ns-head { max-width: 640px; margin-top: 0; }
+.bcpm-app .m-point-alt-client { margin-top: 18px; }
+.bcpm-app .m-point-card .m-point-br { margin-top: 10px; }
+.bcpm-app .m-foot > svg { width: 15px; height: 15px; color: var(--brand-500); }
+.bcpm-app .m-foot-link { margin-left: auto; font-size: 12.5px; }
+/* Start: hero with the seven stages and the start form. */
+.bcpm-app .m-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); overflow: hidden; margin-bottom: 18px; }
+.bcpm-app .m-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(440px 250px at 0 0, rgb(79 70 229 / .09), transparent 70%), radial-gradient(380px 220px at 60% 100%, rgb(139 92 246 / .06), transparent 70%); }
+.bcpm-app .m-hero-main { position: relative; padding: 30px 30px 28px; }
+.bcpm-app .m-kicker { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 9px; border-radius: 999px; background: var(--brand-soft); border: 1px solid #dfe2ff; color: var(--brand-ink); font-size: 12px; font-weight: 600; letter-spacing: .01em; }
+.bcpm-app .m-kicker svg { width: 14px; height: 14px; color: var(--brand); }
+.bcpm-app .m-hero-title { margin-top: 16px; max-width: 580px; font-size: 30px; font-weight: 700; letter-spacing: -.028em; line-height: 1.12; color: var(--ink); overflow-wrap: anywhere; }
+.bcpm-app .m-hero-text { margin-top: 12px; max-width: 540px; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+.bcpm-app .m-hero-side { position: relative; display: flex; flex-direction: column; padding: 26px 26px 24px; border-left: 1px solid var(--line-2); background: linear-gradient(180deg, #fbfbff, #fff 55%); }
+.bcpm-app .m-hero-side-title { font-size: 16px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.bcpm-app .m-hero-side > .m-help { margin-top: 3px; }
+.bcpm-app .m-hero-side .m-field { margin: 16px 0 16px; }
+.bcpm-app .m-hero-side .m-note { margin-top: 12px; }
+.bcpm-app .m-dest { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.bcpm-app .m-dest li { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 11px; align-items: center; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 12px; background: #fff; }
+.bcpm-app .m-dest-ic { grid-row: 1 / 3; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--brand-soft); color: var(--brand); }
+.bcpm-app .m-dest-ic svg { width: 16px; height: 16px; }
+.bcpm-app .m-dest-l { font-size: 11.5px; line-height: 1.3; color: var(--faint); }
+.bcpm-app .m-dest strong { font-size: 13.5px; font-weight: 600; line-height: 1.35; color: var(--ink); overflow-wrap: anywhere; }
+.bcpm-app .m-btn.m-block { width: 100%; }
+.bcpm-app .m-hero-side .m-dest { margin-bottom: 18px; }
+/* Where the site is today and where it goes. */
+.bcpm-app .m-route { display: flex; align-items: center; gap: 14px; max-width: 580px; margin-top: 22px; padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 14px; background: rgb(255 255 255 / .75); }
+.bcpm-app .m-route-node { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.bcpm-app .m-route-node > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.bcpm-app .m-route-ic { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: #fff; border: 1px solid var(--line); color: var(--muted); box-shadow: var(--shadow); }
+.bcpm-app .m-route-ic svg { width: 18px; height: 18px; }
+.bcpm-app .m-route-node.is-dest .m-route-ic { border-color: var(--chrome); background: var(--chrome) radial-gradient(40px 34px at 0 0, rgb(79 70 229 / .7), transparent 75%); color: #fff; box-shadow: 0 8px 18px -10px rgb(79 70 229 / .8); }
+.bcpm-app .m-route-l { font-size: 11.5px; line-height: 1.3; color: var(--faint); }
+.bcpm-app .m-route strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-route-line { flex: 1 1 28px; min-width: 28px; height: 2px; background: repeating-linear-gradient(90deg, var(--brand-500) 0 6px, transparent 6px 11px); opacity: .55; }
+/* The seven segments with the name of each stage under it. */
+.bcpm-app .m-path { margin-top: 26px; }
+.bcpm-app .m-path-label { margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--faint); }
+.bcpm-app .m-segs-lg { gap: 5px; }
+.bcpm-app .m-segs-lg i { height: 9px; border-radius: 5px; }
+.bcpm-app .m-path-steps { list-style: none; margin: 9px 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+.bcpm-app .m-path-steps li { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--faint); }
+.bcpm-app .m-path-steps li.is-done { color: var(--ink-2); }
+.bcpm-app .m-path-steps li.is-now { color: var(--tone); font-weight: 600; }
+.bcpm-app .m-path.is-live .m-segs i { background: #12b76a; box-shadow: none; }
+.bcpm-app .m-path.is-live .m-path-steps li { color: #067a52; }
+/* Feature cards with icons. */
+.bcpm-app .m-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.bcpm-app .m-feat { display: flex; align-items: flex-start; gap: 14px; padding: 18px; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.bcpm-app .m-feat:hover { border-color: #d6d9fe; box-shadow: 0 12px 26px -18px rgb(79 70 229 / .45); transform: translateY(-1px); }
+.bcpm-app .m-feat h2 { font-size: 14px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-feat p { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+/* Migration in progress. */
+.bcpm-app .m-track { padding: 22px 24px 24px; margin-bottom: 18px; background-image: radial-gradient(520px 200px at 0 0, rgb(79 70 229 / .06), transparent 72%); }
+.bcpm-app .m-track-top { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+.bcpm-app .m-track-step { font-size: 12.5px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bcpm-app .m-track-now { margin-top: 14px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; color: var(--ink); }
+.bcpm-app .m-track .m-path { margin-top: 18px; }
+.bcpm-app .m-track-next { display: flex; align-items: center; gap: 7px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line-2); font-size: 13px; color: var(--muted); }
+.bcpm-app .m-track-next svg { width: 15px; height: 15px; color: var(--brand-500); }
+/* What the owner can do now: a card in the tone of the state. */
+.bcpm-app .m-act { overflow: hidden; box-shadow: inset 4px 0 0 var(--tone-dot), var(--shadow); }
+.bcpm-app .m-act .m-tile { background: var(--tone-soft); color: var(--tone); box-shadow: inset 0 0 0 1px var(--tone-line); }
+.bcpm-app .m-act .m-sec-head p, .bcpm-app .m-help-grid .m-sec-head p { max-width: 640px; line-height: 1.5; }
+.bcpm-app .m-sec-head:last-child { border-bottom: 0; }
+.bcpm-app .m-domain-row { flex-wrap: nowrap; width: 100%; max-width: 540px; }
+.bcpm-app .m-domain-row .m-input { flex: 1; min-width: 0; }
+.bcpm-app .m-code { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.bcpm-app .m-code + .m-form-actions { margin-top: 14px; }
+.bcpm-app .m-note + .m-note, .bcpm-app .m-records + .m-note { margin-top: 8px; }
+.bcpm-app .m-note + .m-form-actions, .bcpm-app .m-form-actions + .m-note { margin-top: 14px; }
+/* DNS records. */
+.bcpm-app .m-records { margin-bottom: 14px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.bcpm-app .m-rtable td { vertical-align: middle; }
+.bcpm-app .m-rtable th:first-child { width: 96px; }
+.bcpm-app .m-rtype { display: inline-grid; place-items: center; min-width: 46px; padding: 2px 8px; border-radius: 7px; background: var(--brand-soft); color: var(--brand-ink); font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.bcpm-app .m-rtable .m-dom { margin-top: 2px; font-size: 12px; color: var(--faint); }
+.bcpm-app .m-copyrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bcpm-app .m-rvalue { padding: 4px 9px; border-radius: 7px; background: #f6f7fb; border: 1px solid var(--line-2); color: var(--ink); overflow-wrap: anywhere; }
+.bcpm-app .m-copy.is-copied { color: #067a52; border-color: #bfe6d3; background: #e8f7f0; }
+.bcpm-app .m-deadline { color: var(--ink-2); font-weight: 500; }
+/* Cancelling stays available, but quiet. */
+.bcpm-app .m-quiet { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line); font-size: 12.5px; color: var(--faint); }
+/* Live. */
+.bcpm-app .m-live { display: flex; flex-direction: column; align-items: center; padding: 42px 28px 30px; text-align: center; background-image: radial-gradient(480px 230px at 50% 0, rgb(18 183 106 / .11), transparent 72%); }
+.bcpm-app .m-live-ring { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #34d399, #059669); color: #fff; box-shadow: 0 0 0 8px rgb(18 183 106 / .12), 0 18px 40px -16px rgb(5 150 105 / .8); }
+.bcpm-app .m-live-ring svg { width: 34px; height: 34px; stroke-width: 2.6; }
+.bcpm-app .m-live-title { margin-top: 22px; font-size: 26px; font-weight: 700; letter-spacing: -.024em; color: var(--ink); }
+.bcpm-app .m-live-text { margin-top: 8px; max-width: 540px; font-size: 14.5px; color: var(--muted); overflow-wrap: anywhere; }
+.bcpm-app .m-live .m-path { width: 100%; max-width: 660px; text-align: left; }
+.bcpm-app .m-live-actions { margin-top: 26px; }
+.bcpm-app .m-live .m-when { margin-top: 12px; }
+/* How it works. */
+.bcpm-app .m-stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.bcpm-app .m-stage { padding: 18px; }
+.bcpm-app .m-stage-top { display: flex; align-items: center; justify-content: space-between; }
+.bcpm-app .m-stage-n { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: -.03em; color: #e1e4f2; font-variant-numeric: tabular-nums; }
+.bcpm-app .m-stage h2 { margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-stage p { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.bcpm-app .m-help-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.bcpm-app .m-help-grid .m-sec { margin-bottom: 0; }
+.bcpm-app .m-qa { display: grid; gap: 16px; }
+.bcpm-app .m-qa dt { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-qa dd { margin-top: 4px; font-size: 13px; line-height: 1.55; color: var(--muted); }
+.bcpm-app .m-history td { vertical-align: middle; }
+.bcpm-app .m-client-empty { padding: 56px 24px 50px; }
+/* WHM: who started the migration. */
+.bcpm-app .m-origin { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.bcpm-app .m-origin svg { width: 13px; height: 13px; color: var(--brand-500); }
+.bcpm-app .m-origin.is-account { color: var(--brand-ink); font-weight: 500; }
+@container (max-width: 980px) {
+  .bcpm-app .m-hero { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app .m-hero-side { border-left: 0; border-top: 1px solid var(--line-2); }
+  .bcpm-app .m-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bcpm-app .m-help-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@container (max-width: 860px) {
+  .bcpm-app .m-hero-main { padding: 22px 18px 20px; }
+  .bcpm-app .m-hero-side { padding: 20px 18px; }
+  .bcpm-app .m-hero-title { font-size: 24px; }
+  .bcpm-app .m-feats { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app .m-track { padding: 18px 16px 20px; }
+  .bcpm-app .m-track-now { font-size: 18px; }
+  /* The stage names become a numbered list under the segments. */
+  .bcpm-app .m-path-steps { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 12px; counter-reset: bcpm-step; }
+  .bcpm-app .m-path-steps li { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; white-space: normal; counter-increment: bcpm-step; }
+  .bcpm-app .m-path-steps li::before { content: counter(bcpm-step); display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #eef0f5; color: var(--faint); font-size: 11px; font-weight: 700; }
+  .bcpm-app .m-path-steps li.is-done::before { background: var(--brand); color: #fff; }
+  .bcpm-app .m-path-steps li.is-now::before { background: var(--tone-dot); color: #fff; box-shadow: 0 0 0 3px rgb(var(--tone-rgb) / .18); }
+  .bcpm-app .m-path.is-live .m-path-steps li::before { background: #12b76a; color: #fff; }
+  .bcpm-app .m-domain-row { flex-wrap: wrap; }
+  .bcpm-app .m-domain-row .m-btn, .bcpm-app .m-act .m-form-actions .m-btn, .bcpm-app .m-act .m-form-actions .m-inline { width: 100%; }
+  .bcpm-app .m-records { border: 0; border-radius: 0; margin: 0 -16px 14px; }
+  .bcpm-app .m-chip-domain { max-width: 200px; }
+  .bcpm-app .m-point-card .m-ns { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app .m-quiet { flex-direction: column; align-items: flex-start; }
+  .bcpm-app .m-live { padding: 32px 18px 24px; }
+  .bcpm-app .m-live-title { font-size: 22px; }
+  .bcpm-app .m-live-actions, .bcpm-app .m-live-actions .m-btn { width: 100%; }
+  .bcpm-app .m-foot { flex-wrap: wrap; }
+  .bcpm-app .m-foot > span { flex: 1 1 200px; min-width: 0; }
+  .bcpm-app .m-foot-link { margin-left: 23px; }
+  .bcpm-app .m-route { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .bcpm-app .m-route-line { flex: none; width: 2px; min-width: 0; height: 16px; margin-left: 18px; background: repeating-linear-gradient(180deg, var(--brand-500) 0 5px, transparent 5px 9px); }
+  .bcpm-app .m-route-node, .bcpm-app .m-route-node > span:last-child { max-width: 100%; }
+}
+@container (max-width: 460px) {
+  .bcpm-app .m-stages { grid-template-columns: minmax(0, 1fr); }
+  .bcpm-app.bcpm-client .m-tabs { gap: 2px; }
+  .bcpm-app.bcpm-client .m-tabs a { padding: 0 9px 2px; font-size: 13px; }
+  .bcpm-app .m-hero-title { font-size: 22px; }
+}
+/* ---------- optional domain pointing: never a step, after the migration is complete ---------- */
+.bcpm-app .m-point { flex-basis: 100%; }
+.bcpm-app .m-point summary { display: inline-flex; align-items: center; gap: 6px; padding: 4px 2px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--brand); }
+.bcpm-app .m-point summary svg { width: 15px; height: 15px; }
+.bcpm-app .m-point-body { margin-top: 6px; max-width: 400px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fafbfd; font-size: 12.5px; color: var(--ink-2); }
+.bcpm-app .m-point-lead strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.bcpm-app .m-point-lead span { display: block; margin-top: 2px; color: var(--muted); }
+.bcpm-app .m-point-ns-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: 11.5px; font-weight: 600; color: var(--faint); }
+.bcpm-app .m-ns { display: grid; gap: 6px; margin-top: 6px; }
+.bcpm-app .m-ns > div { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 4px 4px 4px 10px; border: 1px solid var(--line-2); border-radius: 9px; background: #fff; }
+.bcpm-app .m-ns dt { flex: none; font-size: 11px; font-weight: 600; color: var(--faint); }
+.bcpm-app .m-ns dd { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.bcpm-app .m-ns code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--ink); }
+.bcpm-app .m-btn.m-copy-ic { min-height: 28px; padding: 4px 7px; box-shadow: none; }
+.bcpm-app .m-point-body .m-help { margin-top: 8px; }
+.bcpm-app .m-point-br .m-link { font-size: 12.5px; }
+.bcpm-app .m-point-alt { margin-top: 12px; font-size: 12px; color: var(--muted); }
+.bcpm-app .m-arec { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.bcpm-app .m-arec li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.bcpm-app .m-arec code { min-width: 0; overflow-wrap: anywhere; font-size: 12.5px; color: var(--ink); }
+.bcpm-app .m-point-note { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-2); font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.bcpm-app .m-point-note svg { width: 14px; height: 14px; margin-top: 2px; flex: none; color: var(--faint); }
+.bcpm-app .m-pointed { display: flex; align-items: center; gap: 7px; flex-basis: 100%; font-size: 12.5px; color: var(--ink-2); }
+.bcpm-app .m-pointed svg { width: 14px; height: 14px; color: #12b76a; }
+.bcpm-app .m-pointed-lg { justify-content: center; margin-top: 18px; padding: 10px 14px; border-radius: 12px; background: #e8f7f0; color: #067a52; font-size: 13.5px; font-weight: 500; }
+.bcpm-app .m-pointed-lg svg { width: 16px; height: 16px; }
+.bcpm-app .m-live + .m-point-card { margin-top: 18px; }
+.bcpm-app .m-point-lead-client { margin-bottom: 10px; font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.bcpm-app .m-point-card .m-point-note { margin-top: 14px; }
+@container (max-width: 860px) {
+  .bcpm-app .m-point-body { max-width: none; }
+}

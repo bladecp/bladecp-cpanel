@@ -1,0 +1,85 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+
+# BladeCP cPanel Migrator: root side of the cPanel app (AdminBin, mode=full).
+#
+# cPanel runs this program as root for UAPI calls of Cpanel::API::BladeCPMigrator.
+# Cpanel::AdminBin::Script::Call turns the caller UID into the account name,
+# refuses root, unknown accounts and demo mode, and accepts only the
+# functions in _actions. The account name is the only identity passed on to
+# bin/client-admin.php; the request fields are filtered here and again there.
+
+package BladeCP::MigratorClient;
+
+use strict;
+use warnings;
+
+use parent qw( Cpanel::AdminBin::Script::Call );
+
+use Cpanel::JSON ();
+use POSIX        ();
+
+our $PHP    = '@@PHP_BIN@@';
+our $SCRIPT = '@@PLUGIN_HOME@@/bin/client-admin.php';
+
+my @FIELDS     = qw( session csrf job op domain ip team_user );
+my $MAX_FIELD  = 254;
+my $MAX_OUTPUT = 1048576;
+
+__PACKAGE__->run( alarm => 120 ) unless caller;
+
+sub _actions { return qw( STATUS START ACT CLAIM ); }
+
+sub STATUS { my ( $self, $args ) = @_; return $self->_forward( 'status', $args ); }
+sub START  { my ( $self, $args ) = @_; return $self->_forward( 'start',  $args ); }
+sub ACT    { my ( $self, $args ) = @_; return $self->_forward( 'act',    $args ); }
+sub CLAIM  { my ( $self, $args ) = @_; return $self->_forward( 'claim',  $args ); }
+
+sub _forward {
+    my ( $self, $function, $args ) = @_;
+    my $user = $self->get_caller_username();
+    die "Invalid account.\n" if !defined $user || $user !~ m/\A[a-z][a-z0-9]{0,15}\z/;
+
+    my %input;
+    if ( ref $args eq 'HASH' ) {
+        for my $field (@FIELDS) {
+            my $value = $args->{$field};
+            next if !defined $value || ref $value || length $value > $MAX_FIELD;
+            $input{$field} = "$value";
+        }
+    }
+    my $request = Cpanel::JSON::Dump( \%input );
+
+    pipe( my $child_in,  my $to_child )   or die "pipe: $!\n";
+    pipe( my $from_child, my $child_out ) or die "pipe: $!\n";
+    my $pid = fork();
+    die "fork: $!\n" if !defined $pid;
+    if ( !$pid ) {
+        close $to_child;
+        close $from_child;
+        open( STDIN,  '<&', $child_in )  or POSIX::_exit(127);
+        open( STDOUT, '>&', $child_out ) or POSIX::_exit(127);
+        open( STDERR, '>',  '/dev/null' ) or POSIX::_exit(127);
+        %ENV = ( PATH => '/usr/bin:/bin', LANG => 'C' );
+        { no warnings 'exec'; exec {$PHP} $PHP, '-d', 'display_errors=0', '-d', 'log_errors=0', $SCRIPT, $function, "--user=$user"; }
+        POSIX::_exit(127);
+    }
+    close $child_in;
+    close $child_out;
+    print {$to_child} $request;
+    close $to_child;
+
+    my $output = '';
+    while ( length $output <= $MAX_OUTPUT ) {
+        my $read = sysread( $from_child, my $chunk, 65536 );
+        last if !$read;
+        $output .= $chunk;
+    }
+    close $from_child;
+    waitpid( $pid, 0 );
+
+    my $data = eval { Cpanel::JSON::Load($output) };
+    die "The request could not be completed.\n" if ref $data ne 'HASH';
+    return $data;
+}
+
+1;

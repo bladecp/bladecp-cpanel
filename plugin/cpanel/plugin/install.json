@@ -1,0 +1,14 @@
+[
+    {
+        "type": "link",
+        "id": "site_migration",
+        "name": "@@LABEL@@",
+        "group_id": "domains",
+        "order": 1,
+        "icon": "site_migration.svg",
+        "uri": "site_migration/index.live.php",
+        "feature": "site_migration",
+        "target": "_self",
+        "search_text": "bladecp migrate migration move transfer website site migrar migração mover transferir sitio migración"
+    }
+]
