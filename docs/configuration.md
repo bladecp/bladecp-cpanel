@@ -16,7 +16,8 @@ The key is stored in `/var/cpanel/bladecp-migrator/config.json` with mode
 
 The **Advanced** section has a custom API URL. Leave it empty: the plugin uses
 `https://api.bladecp.com/api/v1`. Change it only when BladeCP support asks you
-to.
+to. A new URL needs the partner API key typed again in the same form, so the
+saved key never goes to an address it was not entered for.
 
 ## Migration defaults
 
@@ -27,7 +28,7 @@ to.
 | Product ID in your billing system | A number that correlates the migration with your billing product, such as the WHMCS product ID. Keep 1 if you do not use one. |
 | Main domain | Use the main domain of the account (fewer steps) or confirm it after BladeCP analyzes the backup. |
 | Simultaneous migrations | 1 by default, up to 4. |
-| Work directory | Where backups are written while they are uploaded (default `/home/bladecp-migrator`). Every directory in its path must be owned by root and not writable by group or others. |
+| Work directory | Where backups are written while they are uploaded (default `/home/bladecp-migrator`). Every directory in its path must be owned by root and not writable by group or others, and the directory must be empty or created by the plugin. |
 | Language | Automatic (follows WHM), English, Portuguese (Brazil) or Spanish. |
 
 The cPanel app uses the same defaults for the migrations your customers start.

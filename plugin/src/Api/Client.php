@@ -43,8 +43,8 @@ final class Client
     }
 
     /**
-     * Public brand of the partner (white label name, or the partner name)
-     * for the cPanel app. Logos are not used.
+     * Public brand of the partner (publicName: its white label name, or the
+     * partner name), shown as a reference in the cPanel app. Logos are not used.
      *
      * @return array<string,mixed>
      */

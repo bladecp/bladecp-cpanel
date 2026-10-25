@@ -23,7 +23,7 @@ with `pkgacct`.
 
 ## Validation snapshot
 
-The `0.3.7` release was validated on cPanel & WHM 11.138 with AlmaLinux 9 and
+The `0.3.8` release was validated on cPanel & WHM 11.138 with AlmaLinux 9 and
 the PHP 8.4 shipped with cPanel. These are tested environments, not additional
 minimum requirements. Validate the plugin on a non-production server before
 using it in production.

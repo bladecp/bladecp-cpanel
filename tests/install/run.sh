@@ -119,6 +119,7 @@ echo "== install"
 "$REPO/install.sh" > "$BASE/install1.log"
 cp "$BASE/calls.log" "$BASE/calls-install1.log"
 # A favorite saved under the name of 0.3.4, between two other favorites.
+# shellcheck disable=SC2016 # WHM favorite ids are "group$key", a literal $.
 printf '["account_information$list_accounts","plugins$bladecp_cpanel_migrator","plugins$wp_toolkit"]' > "$FAVORITES_STATE"
 ID1="$(sed -n 's/.*"installation_id": "\(.*\)".*/\1/p' "$ROOT/var/cpanel/bladecp-migrator/config.json")"
 # An entry left by an earlier version keeps its old label in install_plugin.
@@ -168,6 +169,7 @@ check "Banner marker kept in the data directory" test -f "$ROOT/var/cpanel/blade
 check "Includes of other products are kept" grep -qx '<div>analytics</div>' "$INCLUDES/cpanel_jupiter_cp_analytics.html.tt"
 check "Installer explains how to pin the plugin and pins nothing" bash -c "grep -q 'choose \"Pin to the top\" (also in Settings)' '$BASE/install1.log' && ! grep -q 'personalization_set' '$BASE/calls-install1.log'"
 check "Without saved favorites the installer only reads them" bash -c "grep -q 'whmapi1 personalization_get' '$BASE/calls-install1.log'"
+# shellcheck disable=SC2016 # WHM favorite ids are "group$key", a literal $.
 check "A reinstall moves the favorite of the former name to the new one, in the same place" grep -qxF '["account_information$list_accounts","plugins$bladecp_migrar_e_transferir_contas","plugins$wp_toolkit"]' "$FAVORITES_STATE"
 check "The AppConfig name, description and search words follow the server language (pt)" bash -c "grep -qx 'displayname=BladeCP: Migrar e Transferir Contas' '$ROOT/var/cpanel/apps/bladecp_migrator.conf' && grep -qx 'description=Migre e transfira contas cPanel deste servidor para a BladeCP (transferência com prévia e cobrança pelo seu WHMCS).' '$ROOT/var/cpanel/apps/bladecp_migrator.conf' && grep -q '^searchtext=.* transfer .*transferir' '$ROOT/var/cpanel/apps/bladecp_migrator.conf' && ! grep -q '^section=' '$ROOT/var/cpanel/apps/bladecp_migrator.conf' && cmp -s '$ROOT/var/cpanel/apps/bladecp_migrator.conf' '$HOME_PLUGIN/appconfig/bladecp_migrator.conf'"
 check "Installer names the plugin as WHM lists it" grep -q 'choose "BladeCP: Migrar e Transferir Contas"' "$BASE/install1.log"
@@ -184,6 +186,7 @@ rm -f "$FAVORITES_STATE"
 "$REPO/install.sh" > "$BASE/install-pt-again.log"
 check "Installer says the app is in the side menu too" grep -q 'in the Domains group and in the side menu' "$BASE/install1.log"
 CONFIG="$ROOT/var/cpanel/bladecp-migrator/config.json"
+# shellcheck disable=SC2016 # The $ belong to the PHP code.
 set_banner() { "$BLADECP_MIGRATOR_PHP" -r '$c = json_decode(file_get_contents($argv[1]), true); $c["cpanel_banner"] = $argv[2] === "on"; file_put_contents($argv[1], json_encode($c));' "$CONFIG" "$1"; }
 set_banner off
 "$REPO/install.sh" > "$BASE/install-banner-off.log"
@@ -252,6 +255,15 @@ check "install keeps the foreign include and warns" bash -c "grep -qx '<p>notice
 "$ROOT/usr/local/bladecp-migrator/uninstall.sh" --purge > "$BASE/uninstall-foreign-include.log"
 check "uninstall keeps the foreign include" grep -qx '<p>notice of the hosting company</p>' "$BANNER_INCLUDE"
 rm -f "$BANNER_INCLUDE"
+
+echo "== purge keeps a work directory that still holds other files"
+"$REPO/install.sh" > "$BASE/install-workdir.log"
+mkdir -p "$ROOT/home/bladecp-migrator"
+: > "$ROOT/home/bladecp-migrator/.bladecp-migrator"
+printf 'notes of the administrator\n' > "$ROOT/home/bladecp-migrator/notes.txt"
+"$ROOT/usr/local/bladecp-migrator/uninstall.sh" --purge > "$BASE/uninstall-workdir.log"
+check "purge keeps the other files and the marker, so a new installation can use the directory" bash -c "test -f '$ROOT/home/bladecp-migrator/notes.txt' && test -f '$ROOT/home/bladecp-migrator/.bladecp-migrator' && grep -q 'still marked as the work directory' '$BASE/uninstall-workdir.log'"
+rm -rf "$ROOT/home/bladecp-migrator"
 
 echo
 if [ "$FAIL" -eq 0 ]; then

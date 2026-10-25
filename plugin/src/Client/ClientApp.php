@@ -26,10 +26,16 @@ use BladeCP\CpanelMigrator\Web\View;
  * the security token (cp_security_token, or the /cpsess path cpsrvd
  * accepted), else the cpsession cookie cPanel set at login. Without any of
  * them the page is read-only.
+ *
+ * The account confirmation (?go=claim, with the form token in `t`) and the
+ * preview (?go=preview) are links opened in a new tab: their URLs only
+ * travel in the Location of a 303 with Referrer-Policy: no-referrer.
  */
 final class ClientApp
 {
     public const PAGES = ['migration', 'history', 'help'];
+    /** POST actions; the account confirmation is the GET ?go=claim (see claim()). */
+    public const ACTIONS = ['start', 'act'];
     private const SHELL_PARAMS = ['page', 'notice', 'ok'];
     private const APP_PATH = '#^(?:/cpsess\d{10})?/frontend/[A-Za-z0-9_-]{1,40}/site_migration/(?:index\.live\.php)?$#D';
     private const NOTICE = '/^client\.notice\.[a-z_]{1,40}$/D';
@@ -64,7 +70,8 @@ final class ClientApp
             if ($this->gateway === null) {
                 return $this->message(null, 'unavailable', 503);
             }
-            if (!$this->request->isPost() && !$this->framed() && !$this->standalone() && $this->request->query('go') !== 'preview') {
+            $go = $this->request->query('go');
+            if (!$this->request->isPost() && !$this->framed() && !$this->standalone() && $go !== 'preview' && $go !== 'claim') {
                 $shell = $this->shell();
                 if ($shell !== null) {
                     return $shell;
@@ -73,8 +80,11 @@ final class ClientApp
             if ($this->request->isPost()) {
                 return $this->post();
             }
-            if ($this->request->query('go') === 'preview') {
+            if ($go === 'preview') {
                 return $this->preview();
+            }
+            if ($go === 'claim') {
+                return $this->claim();
             }
             return $this->get(null);
         } catch (\Throwable) {
@@ -152,14 +162,12 @@ final class ClientApp
             return $this->message(null, 'expired', 403);
         }
         $action = $this->request->inputString('action');
-        if (!in_array($action, ['start', 'act', 'claim'], true)) {
+        if (!in_array($action, self::ACTIONS, true)) {
             return $this->redirect('client.notice.not_available', false);
         }
         // No owner e-mail is ever sent: the provider billing WHMCS links the owner.
         $args = ['session' => $this->sessionKey(), 'csrf' => $this->request->inputString(Csrf::FIELD)];
-        if ($action === 'claim') {
-            $args['job'] = $this->request->inputString('job');
-        } elseif ($action === 'act') {
+        if ($action === 'act') {
             $args['job'] = $this->request->inputString('job');
             $args['op'] = $this->request->inputString('op');
             $args['domain'] = strtolower(trim($this->request->inputString('domain')));
@@ -172,20 +180,47 @@ final class ClientApp
         } catch (GatewayError) {
             return $this->redirect('client.notice.unavailable', false);
         }
-        // Confirm the account: this tab goes straight to the client area. The URL
-        // holds a token, so it only travels in this Location header.
-        if ($action === 'claim' && !empty($result['ok']) && is_string($result['url'] ?? null)) {
-            $parts = parse_url($result['url']);
+        // Booleans may come back from the Perl layer as 1 or 0.
+        return $this->redirect($this->noticeKey($result), !empty($result['ok']));
+    }
+
+    /**
+     * "Confirm my account": a link opened in a new tab, with the job and the
+     * form token of the page (the root side checks it against the account
+     * and the session). On success the tab goes straight to the client area:
+     * the URL holds a token, so it only travels in this Location header.
+     * Otherwise the tab comes back to the app with the notice, without the
+     * form token in its address.
+     */
+    private function claim(): Response
+    {
+        $args = [
+            'session' => $this->sessionKey(),
+            'csrf' => substr((string) $this->request->query('t'), 0, 254),
+            'job' => substr((string) $this->request->query('job'), 0, 254),
+        ];
+        try {
+            $result = $this->gateway?->call('claim', $args) ?? [];
+        } catch (GatewayError) {
+            return $this->redirect('client.notice.unavailable', false);
+        }
+        if (!empty($result['ok'])) {
+            $url = $result['url'] ?? null;
+            $parts = is_string($url) ? parse_url($url) : false;
             if (is_array($parts) && strtolower((string) ($parts['scheme'] ?? '')) === 'https' && !empty($parts['host'])
-                && preg_match('/[\s"<>\\\\]/', $result['url']) !== 1) {
-                return Response::away($result['url']);
+                && preg_match('/[\s"<>\\\\]/', (string) $url) !== 1) {
+                return Response::away((string) $url);
             }
             $result = ['ok' => false, 'notice' => 'client.notice.failed'];
         }
-        $key = is_string($result['notice'] ?? null) && preg_match(self::NOTICE, $result['notice']) === 1 && $this->i18n()->has($result['notice'])
+        return $this->redirect($this->noticeKey($result), false);
+    }
+
+    /** @param array<string,mixed> $result */
+    private function noticeKey(array $result): string
+    {
+        return is_string($result['notice'] ?? null) && preg_match(self::NOTICE, $result['notice']) === 1 && $this->i18n()->has($result['notice'])
             ? $result['notice'] : 'client.notice.failed';
-        // Booleans may come back from the Perl layer as 1 or 0.
-        return $this->redirect($key, !empty($result['ok']));
     }
 
     /** "Open preview": straight to the preview, so its address never sits in the page. */

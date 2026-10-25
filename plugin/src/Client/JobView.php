@@ -38,7 +38,7 @@ final class JobView
     public const POINTING = ['pending', 'stalled', 'connected'];
     public const ERRORS = ['copy', 'transfer', 'generic', 'failed', 'retrying'];
 
-    private const COPY_CODES = ['account_not_found', 'whmapi_failed', 'backup_failed', 'backup_missing', 'backup_aborted', 'disk_space_low', 'work_dir_unsafe'];
+    private const COPY_CODES = ['account_not_found', 'whmapi_failed', 'backup_failed', 'backup_missing', 'backup_aborted', 'disk_space_low', 'work_dir_unsafe', 'work_dir_foreign'];
 
     /** @param array<string,mixed> $job */
     public static function state(array $job): string

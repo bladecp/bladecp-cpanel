@@ -327,13 +327,15 @@ final class ClientView
                 return $this->act('warning', 'eye', $this->t('client.approval.title'), $this->t('client.approval.text'), $buttons . $readonly);
             case 'claim':
                 // The account holder confirms the account in the provider client area (new tab).
-                // The URL is asked for only on the click and never sits in this page.
+                // A plain link (GET), never a form: browsers apply form-action to the redirects
+                // of a form submission. It leaves out the frame, so a refusal comes back to the
+                // full page. The URL is asked for only on the click and never sits in this page.
                 $brand = $this->brand;
-                $button = '<form method="post" action="' . Ui::e($this->url(['page' => 'migration'])) . '" class="m-inline" target="_blank" rel="noopener noreferrer">'
-                    . ($csrf !== null ? $this->csrfField($csrf) : '') . '<input type="hidden" name="action" value="claim">'
-                    . '<input type="hidden" name="job" value="' . Ui::e($job['id'] ?? '') . '">'
-                    . '<button class="m-btn m-primary" type="submit"' . ($csrf === null || !in_array('claim', $actions, true) ? ' disabled' : '') . '>' . Ui::icon('external')
-                    . Ui::e($this->t('client.claim.button')) . '</button></form>';
+                $button = $csrf !== null && in_array('claim', $actions, true)
+                    ? '<a class="m-btn m-primary" href="' . Ui::e('?' . http_build_query(array_diff_key($this->mode, ['frame' => true])
+                        + ['go' => 'claim', 'job' => (string) ($job['id'] ?? ''), 't' => $csrf])) . '" target="_blank" rel="noopener noreferrer">'
+                        . Ui::icon('external') . Ui::e($this->t('client.claim.button')) . '</a>'
+                    : '<button class="m-btn m-primary" type="button" disabled>' . Ui::icon('external') . Ui::e($this->t('client.claim.button')) . '</button>';
                 return $this->act('warning', 'user',
                     $brand !== null ? $this->t('client.claim.title', ['brand' => $brand]) : $this->t('client.claim.title_neutral'),
                     $brand !== null ? $this->t('client.claim.text', ['brand' => $brand]) : $this->t('client.claim.text_neutral'),

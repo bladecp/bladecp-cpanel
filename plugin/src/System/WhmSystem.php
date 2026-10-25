@@ -22,7 +22,7 @@ final class WhmSystem implements SystemAdapter
     public const WHMAPI1 = '/usr/local/cpanel/bin/whmapi1';
     public const PKGACCT = '/usr/local/cpanel/scripts/pkgacct';
     private const NICE = '/bin/nice';
-    private const LIST_FIELDS = 'user,domain,email,suspended,diskused,owner,plan,partition';
+    private const LIST_FIELDS = 'user,domain,email,suspended,diskused,owner,plan,partition,unix_startdate';
     private const BACKUP_TIMEOUT = 86400;
 
     public function __construct(
@@ -137,10 +137,20 @@ final class WhmSystem implements SystemAdapter
                 'owner' => (string) ($row['owner'] ?? ''),
                 'plan' => (string) ($row['plan'] ?? ''),
                 'partition' => (string) ($row['partition'] ?? ''),
+                'started' => self::startDate($row['unix_startdate'] ?? null),
             ];
         }
         usort($accounts, static fn (array $a, array $b): int => strcmp($a['user'], $b['user']));
         return $accounts;
+    }
+
+    /** Creation time of the account (listaccts unix_startdate), or null when the server does not report it. */
+    public static function startDate(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+        return is_string($value) && preg_match('/^[1-9]\d{0,11}$/D', $value) === 1 ? (int) $value : null;
     }
 
     /** Converts values such as "512M", "1.5G" or "2048" (MiB) to bytes. */

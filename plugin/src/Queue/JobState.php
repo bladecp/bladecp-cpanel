@@ -145,6 +145,20 @@ final class JobState
         return $status !== null ? in_array($status, self::BILLING_WAITING, true) : self::usesBillingLink($job);
     }
 
+    /**
+     * Whether $job belongs to the account that has its name now. An account
+     * removed and created again with the same name has another creation time
+     * ($started, from listaccts). Jobs from before 0.3.8 and servers that do
+     * not report the time match by name alone, as before.
+     *
+     * @param array<string,mixed> $job
+     */
+    public static function sameAccount(array $job, ?int $started): bool
+    {
+        $recorded = $job['account_started'] ?? null;
+        return !is_int($recorded) || $started === null || $recorded === $started;
+    }
+
     /** Origin of a job; jobs created before the cPanel app came from WHM. */
     public static function origin(array $job): string
     {

@@ -13,14 +13,14 @@ the same checksum.
 
 ## Verify and install
 
-Run as root on the server, replacing `0.3.7` with the version you install:
+Run as root on the server, replacing `0.3.8` with the version you install:
 
 ```sh
-curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/bladecp-cpanel-migrator-0.3.7.tar.gz
-curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/SHA256SUMS
+curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/bladecp-cpanel-migrator-0.3.8.tar.gz
+curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/SHA256SUMS
 sha256sum -c SHA256SUMS
-tar -xzf bladecp-cpanel-migrator-0.3.7.tar.gz
-cd bladecp-cpanel-migrator-0.3.7
+tar -xzf bladecp-cpanel-migrator-0.3.8.tar.gz
+cd bladecp-cpanel-migrator-0.3.8
 ./install.sh
 ```
 

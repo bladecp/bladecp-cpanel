@@ -147,7 +147,7 @@ final class Settings
         return in_array($this->values['ui_language'], self::LANGUAGES, true) ? $this->values['ui_language'] : 'auto';
     }
 
-    /** Name the cPanel app shows instead of the platform brand; '' when not set. */
+    /** Partner name the cPanel app shows as a reference; '' when not set. */
     public function clientBrandName(): string
     {
         $value = $this->values['client_brand_name'];

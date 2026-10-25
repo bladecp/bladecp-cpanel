@@ -15,7 +15,7 @@ use BladeCP\CpanelMigrator\System\SystemError;
 use BladeCP\CpanelMigrator\System\WhmSystem;
 
 /**
- * Root side of the cPanel app: the three functions of the AdminBin.
+ * Root side of the cPanel app: the four functions of the AdminBin.
  *
  * The account is the one cPanel authenticated (the AdminBin turns the
  * caller UID into the account name); it is never a request field. A job of
@@ -110,7 +110,7 @@ final class Backend
             return $base + ['available' => false];
         }
         $now = $this->runtime->clock->now();
-        [$current, $history] = $this->jobs();
+        [$current, $history] = $this->jobs($account);
         $view = $current === null ? null : JobView::from($current, $now);
         $csrf = $this->csrf($args['session'] ?? '');
         return $base + [
@@ -153,7 +153,7 @@ final class Backend
         if ($account === null || $account['suspended']) {
             return self::notice(false, 'client.notice.unavailable');
         }
-        [$current] = $this->jobs();
+        [$current] = $this->jobs($account);
         if ($current !== null && !JobState::isTerminal($current)) {
             return self::notice(false, 'client.notice.already');
         }
@@ -176,7 +176,12 @@ final class Backend
         }
         if ($result['created'] === []) {
             $errors = $result['errors'][$this->user] ?? [];
-            return self::notice(false, ($errors['user'] ?? null) === 'accounts.error.already_queued' ? 'client.notice.already' : 'client.notice.failed');
+            if (($errors['user'] ?? null) !== 'accounts.error.already_queued') {
+                return self::notice(false, 'client.notice.failed');
+            }
+            // The job in the way may be of an earlier account with this name: nothing is said about it.
+            [$current] = $this->jobs($account);
+            return self::notice(false, $current !== null && !JobState::isTerminal($current) ? 'client.notice.already' : 'client.notice.unavailable');
         }
         $this->audit('cpapp.start', $args, ['job' => $result['created'][0]]);
         return self::notice(true, 'client.notice.started');
@@ -196,8 +201,14 @@ final class Backend
         }
         $id = $args['job'] ?? '';
         $job = Uuid::isValid($id) ? $this->runtime->store->job($id) : null;
+        // Acting needs the account as WHM sees it now, never a cached copy.
+        $account = $this->account(true);
+        if ($account === null) {
+            $this->audit('cpapp.action', $args, ['op' => $op, 'result' => 'unavailable']);
+            return self::notice(false, 'client.notice.unavailable');
+        }
         // A job of another account is answered exactly like a missing one.
-        if ($job === null || ($job['user'] ?? null) !== $this->user) {
+        if ($job === null || !$this->owns($job, $account)) {
             $this->audit('cpapp.action', $args, ['op' => $op, 'result' => 'not_found']);
             return self::notice(false, 'client.notice.not_found');
         }
@@ -234,7 +245,12 @@ final class Backend
         }
         $id = $args['job'] ?? '';
         $job = Uuid::isValid($id) ? $this->runtime->store->job($id) : null;
-        if ($job === null || ($job['user'] ?? null) !== $this->user) {
+        $account = $this->account(true);
+        if ($account === null) {
+            $this->audit('cpapp.claim', $args, ['result' => 'unavailable']);
+            return self::notice(false, 'client.notice.unavailable');
+        }
+        if ($job === null || !$this->owns($job, $account)) {
             $this->audit('cpapp.claim', $args, ['result' => 'not_found']);
             return self::notice(false, 'client.notice.not_found');
         }
@@ -270,11 +286,12 @@ final class Backend
      * Current migration of the account (the active one, else the latest)
      * and the earlier ones, newest first.
      *
+     * @param array<string,mixed>|null $account
      * @return array{0:?array<string,mixed>,1:list<array<string,mixed>>}
      */
-    private function jobs(): array
+    private function jobs(?array $account): array
     {
-        $mine = array_values(array_filter($this->runtime->store->jobs(), fn (array $job): bool => ($job['user'] ?? null) === $this->user));
+        $mine = array_values(array_filter($this->runtime->store->jobs(), fn (array $job): bool => $this->owns($job, $account)));
         $mine = array_reverse($mine);
         $current = null;
         foreach ($mine as $job) {
@@ -289,19 +306,37 @@ final class Backend
     }
 
     /**
-     * Main domain, contact e-mail and suspension of the account, from WHM
-     * (cached for a few minutes when only displaying).
+     * A job of this account: its name and, when both are known, its creation
+     * time, so an account created again with the same name never sees or acts
+     * on the jobs of the one before.
      *
-     * @return array{domain:string,email:?string,suspended:bool}|null
+     * @param array<string,mixed> $job
+     * @param array<string,mixed>|null $account
+     */
+    private function owns(array $job, ?array $account): bool
+    {
+        return ($job['user'] ?? null) === $this->user && JobState::sameAccount($job, is_int($account['started'] ?? null) ? $account['started'] : null);
+    }
+
+    /**
+     * Main domain, contact e-mail, suspension and creation time of the
+     * account, from WHM (cached for a few minutes when only displaying). The
+     * cache also keeps the inode and change time of the account file, so an
+     * account removed and created again never reads the entry of the one
+     * before.
+     *
+     * @return array{domain:string,email:?string,suspended:bool,started:?int}|null
      */
     private function account(bool $fresh): ?array
     {
         $cacheName = 'client-acct-' . $this->user;
         $now = $this->runtime->clock->now();
+        $signature = $this->accountSignature();
         if (!$fresh) {
             $cached = $this->runtime->store->cacheGet($cacheName, self::ACCOUNT_CACHE_SECONDS, $now);
-            if (is_array($cached) && is_string($cached['domain'] ?? null)) {
-                return ['domain' => $cached['domain'], 'email' => is_string($cached['email'] ?? null) ? $cached['email'] : null, 'suspended' => !empty($cached['suspended'])];
+            if (is_array($cached) && is_string($cached['domain'] ?? null) && ($cached['file'] ?? '') === $signature) {
+                return ['domain' => $cached['domain'], 'email' => is_string($cached['email'] ?? null) ? $cached['email'] : null, 'suspended' => !empty($cached['suspended']),
+                    'started' => is_int($cached['started'] ?? null) ? $cached['started'] : null];
             }
         }
         try {
@@ -312,9 +347,19 @@ final class Backend
         if ($account === null) {
             return null;
         }
-        $value = ['domain' => (string) $account['domain'], 'email' => is_string($account['email'] ?? null) ? $account['email'] : null, 'suspended' => !empty($account['suspended'])];
-        $this->runtime->store->cachePut($cacheName, $value, $now);
+        $value = ['domain' => (string) $account['domain'], 'email' => is_string($account['email'] ?? null) ? $account['email'] : null, 'suspended' => !empty($account['suspended']),
+            'started' => is_int($account['started'] ?? null) ? $account['started'] : null];
+        $this->runtime->store->cachePut($cacheName, $value + ['file' => $signature], $now);
         return $value;
+    }
+
+    /** Inode and change time of the account file (/var/cpanel/users/<user>), '' when it cannot be read. */
+    private function accountSignature(): string
+    {
+        $file = $this->locales->accountFile($this->user);
+        clearstatcache(true, $file);
+        $stat = @stat($file);
+        return is_array($stat) ? $stat['ino'] . ':' . $stat['ctime'] : '';
     }
 
     /**

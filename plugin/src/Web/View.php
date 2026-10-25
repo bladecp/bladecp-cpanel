@@ -881,7 +881,8 @@ final class View
     }
 
     /**
-     * What the cPanel app shows to the account owners (white label).
+     * What the cPanel app shows to the account owners: the partner name, as
+     * a reference, and the support link.
      *
      * @param array<string,string> $errors
      * @param array<string,mixed> $input

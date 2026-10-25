@@ -287,7 +287,8 @@ final class App
 
     private function saveConnection(): Response
     {
-        [$patch, $errors] = SettingsValidator::connection($this->request->post);
+        // A new API address needs the key typed again: the saved key never goes to a host it was not saved for.
+        [$patch, $errors] = SettingsValidator::connection($this->request->post, $this->runtime->settings()->apiBaseUrl());
         if ($errors !== []) {
             return $this->settingsPage(null, $errors, ['api_base_url' => $this->request->inputString('api_base_url')], 422);
         }

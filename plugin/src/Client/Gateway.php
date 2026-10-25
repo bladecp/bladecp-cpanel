@@ -6,14 +6,14 @@ namespace BladeCP\CpanelMigrator\Client;
 
 /**
  * What the cPanel page (running as the account) can ask cPanel for: the
- * three functions of the root side through UAPI, the account language and
+ * four functions of the root side through UAPI, the account language and
  * the Jupiter header and footer. Production uses LiveApiGateway; tests use
  * a gateway that calls Backend directly.
  */
 interface Gateway
 {
     /**
-     * Calls status, start or act.
+     * Calls status, start, act or claim.
      *
      * @param array<string,string> $args
      * @return array<string,mixed>

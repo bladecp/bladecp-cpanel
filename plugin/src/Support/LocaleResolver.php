@@ -20,6 +20,12 @@ final class LocaleResolver
     ) {
     }
 
+    /** File of a cPanel account (/var/cpanel/users/<user>), also read here for its language. */
+    public function accountFile(string $user): string
+    {
+        return $this->cpanelUsersDir . '/' . $user;
+    }
+
     /** @param array<string,string> $cookies */
     public function resolve(string $setting, array $cookies, string $remoteUser): string
     {

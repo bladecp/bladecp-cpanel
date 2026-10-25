@@ -57,6 +57,19 @@ final class Enqueuer
                 return ['created' => [], 'errors' => [], 'general' => 'accounts.error.hostname'];
             }
         }
+        // The check for a job in progress and the creation of the new jobs run under
+        // one lock: two submissions at the same time (WHM and the cPanel app, or a
+        // double click) cannot queue the same account twice.
+        return $this->store->withLock('enqueue', fn (): array => $this->enqueueLocked($batch, $rows, $linked, $hostname));
+    }
+
+    /**
+     * @param array<string,mixed> $batch
+     * @param list<array<string,mixed>> $rows
+     * @return array{created:list<string>,errors:array<string,array<string,string>>,general:?string}
+     */
+    private function enqueueLocked(array $batch, array $rows, bool $linked, string $hostname): array
+    {
         $accounts = [];
         foreach ($this->system->listAccounts() as $account) {
             $accounts[$account['user']] = $account;
@@ -69,8 +82,12 @@ final class Enqueuer
         foreach ($rows as $row) {
             $user = is_string($row['user'] ?? null) ? $row['user'] : '';
             $account = $accounts[$user] ?? null;
-            if ($account === null || isset($seen[$user])) {
+            if ($account === null) {
                 $errors[$user === '' ? '?' : $user]['user'] = 'accounts.error.unknown_account';
+                continue;
+            }
+            if (isset($seen[$user])) {
+                $errors[$user]['user'] = 'accounts.error.duplicate';
                 continue;
             }
             $seen[$user] = true;
@@ -147,6 +164,10 @@ final class Enqueuer
             $job = JobState::create($requestId, $account['user'], $account['domain'], $item['service_id'], $payload, $now,
                 $origin, (string) ($batch['initiated_by'] ?? 'root'));
             $job['estimated_bytes'] = $account['disk_used_bytes'];
+            // Binds the job to this account, not only to its name (see JobState::sameAccount).
+            if (is_int($account['started'] ?? null)) {
+                $job['account_started'] = $account['started'];
+            }
             $this->store->createJob($job);
             $created[] = $requestId;
             $this->log->info('job.queued', ['job' => $requestId, 'user' => $account['user'], 'mode' => $batch['commercial']['mode'] ?? '', 'origin' => $job['origin']]);

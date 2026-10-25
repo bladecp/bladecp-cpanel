@@ -4,6 +4,20 @@ All notable changes to BladeCP cPanel Migrator are documented here. The format f
 
 0.3.7 is the first public release. The earlier versions below were private pre-releases and are listed for reference.
 
+## [0.3.8] - 2026-10-25
+
+### Fixed
+
+- **Confirm my account** in the cPanel app is now a link that opens the client area of your provider in a new tab. It was a form, and browsers that apply the form-action policy of the app to the redirect of a form, such as Chrome, blocked it. When the confirmation cannot start, the new tab comes back to the app with the reason.
+- Two requests for the same account at the same time, from WHM and the cPanel app or a double click, can no longer queue the account twice.
+- An account listed twice in the same WHM batch is reported as a duplicate instead of as an account that was not found.
+
+### Security
+
+- Migrations created from 0.3.8 on keep the creation time of their cPanel account, as WHM reports it. An account removed and created again with the same name does not see or act on those migrations, and the worker does not back it up for them.
+- Changing the BladeCP API URL in WHM needs the partner API key typed again in the same form, so the saved key is never sent to an address it was not entered for.
+- An existing work directory is used only when it is empty or already marked by the plugin, and its permissions change only after it passes the safety checks. The plugin no longer changes the mode of a directory that belongs to something else, and `uninstall.sh --purge` keeps the mark on a work directory that still holds other files, so a new installation can use it.
+
 ## [0.3.7] - 2026-10-17
 
 First public release.

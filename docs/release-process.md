@@ -7,9 +7,9 @@ does not publish it.
 ## The three steps
 
 ```sh
-./scripts/public-release.sh prepare 0.3.7
-./scripts/public-release.sh stage-github 0.3.7 --public-base <clean-public-main-checkout>
-./scripts/public-release.sh publish 0.3.7 --confirm-publication v0.3.7
+./scripts/public-release.sh prepare 0.3.8
+./scripts/public-release.sh stage-github 0.3.8 --public-base <clean-public-main-checkout>
+./scripts/public-release.sh publish 0.3.8 --confirm-publication v0.3.8
 ```
 
 `prepare` runs the release gates and creates the reviewed artifact directory.

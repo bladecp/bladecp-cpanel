@@ -33,19 +33,29 @@ final class WorkDir
         return $this->root;
     }
 
-    /** Creates the root (mode 0700) when missing and checks its ancestry. */
+    /**
+     * Creates the root (mode 0700) when missing and checks its ancestry. An
+     * existing directory is used only when it is safe and either empty or
+     * marked by this plugin, and only then gets mode 0700: the mode of a
+     * directory of someone else is never changed.
+     */
     public function prepare(): void
     {
         $parent = dirname($this->root);
         self::assertSafe($parent, $this->requiredUid, $this->trustedBase);
+        $marker = $this->root . '/' . self::MARKER;
         if (!is_dir($this->root)) {
             if (is_link($this->root) || (!@mkdir($this->root, 0700) && !is_dir($this->root))) {
                 throw new SystemError(SystemError::WORK_DIR_UNSAFE, 'The work directory cannot be created.');
             }
+        } else {
+            self::assertSafe($this->root, $this->requiredUid, $this->trustedBase);
+            if (!is_file($marker) && !self::isEmpty($this->root)) {
+                throw new SystemError(SystemError::WORK_DIR_FOREIGN, 'The work directory already holds files that are not of this plugin.');
+            }
         }
         @chmod($this->root, 0700);
         self::assertSafe($this->root, $this->requiredUid, $this->trustedBase);
-        $marker = $this->root . '/' . self::MARKER;
         if (!is_file($marker)) {
             @file_put_contents($marker, "Created by BladeCP cPanel Migrator. Backups are removed after upload.\n");
             @chmod($marker, 0600);
@@ -138,6 +148,12 @@ final class WorkDir
         if (($mode & 0022) !== 0) {
             throw new SystemError(SystemError::WORK_DIR_UNSAFE, 'A work directory component is writable by other users.');
         }
+    }
+
+    private static function isEmpty(string $dir): bool
+    {
+        $entries = @scandir($dir);
+        return is_array($entries) && array_diff($entries, ['.', '..']) === [];
     }
 
     private static function removeTree(string $dir): void

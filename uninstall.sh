@@ -133,8 +133,14 @@ if [ -d "$WORK_DIR" ] && [ ! -L "$WORK_DIR" ] && [ -f "$WORK_DIR/.bladecp-migrat
         fi
     done
     if [ "$PURGE" -eq 1 ]; then
-        rm -f "$WORK_DIR/.bladecp-migrator"
-        rmdir "$WORK_DIR" 2>/dev/null || say "Warning: $WORK_DIR is not empty and was kept."
+        # With other files left, the directory keeps its marker, so a new
+        # installation can use it again (an unmarked directory with files is refused).
+        if [ -z "$(find "$WORK_DIR" -mindepth 1 -maxdepth 1 ! -name .bladecp-migrator -print -quit)" ]; then
+            rm -f "$WORK_DIR/.bladecp-migrator"
+            rmdir "$WORK_DIR" 2>/dev/null || say "Warning: $WORK_DIR could not be removed."
+        else
+            say "Warning: $WORK_DIR is not empty and was kept, still marked as the work directory of this plugin."
+        fi
     fi
 fi
 

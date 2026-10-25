@@ -11,22 +11,22 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/versi%C3%B3n-0.3.7-4f46e5?style=flat-square&amp;labelColor=1e1b4b" alt="Versión 0.3.7"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/versi%C3%B3n-0.3.8-4f46e5?style=flat-square&amp;labelColor=1e1b4b" alt="Versión 0.3.8"></a>
   <a href="#requisitos"><img src="https://img.shields.io/badge/PHP-8.1%2B-6366f1?style=flat-square&amp;labelColor=1e1b4b&amp;logo=php&amp;logoColor=white" alt="PHP 8.1 o posterior"></a>
   <a href="#requisitos"><img src="https://img.shields.io/badge/cPanel%20%26%20WHM-validado%20en%2011.138-4f46e5?style=flat-square&amp;labelColor=1e1b4b" alt="Validado en cPanel y WHM 11.138"></a>
   <a href="#requisitos"><img src="https://img.shields.io/badge/idiomas-EN%20%C2%B7%20PT--BR%20%C2%B7%20ES-7c3aed?style=flat-square&amp;labelColor=1e1b4b" alt="Inglés, portugués (Brasil) y español"></a><br>
-  <a href="#calidad"><img src="https://img.shields.io/badge/pruebas-769%20aprobadas-8b5cf6?style=flat-square&amp;labelColor=1e1b4b" alt="769 verificaciones automatizadas aprobadas en la versión 0.3.7"></a>
+  <a href="#calidad"><img src="https://img.shields.io/badge/pruebas-789%20aprobadas-8b5cf6?style=flat-square&amp;labelColor=1e1b4b" alt="789 verificaciones automatizadas aprobadas en la versión 0.3.8"></a>
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/estado-preliminar-6d28d9?style=flat-square&amp;labelColor=1e1b4b" alt="Versión preliminar"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-MIT-4338ca?style=flat-square&amp;labelColor=1e1b4b" alt="Licencia MIT"></a>
   <a href="https://github.com/bladecp/bladecp-cpanel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/bladecp/bladecp-cpanel/ci.yml?branch=main&amp;style=flat-square&amp;labelColor=1e1b4b&amp;label=CI%20p%C3%BAblico" alt="Estado del CI público"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/bladecp-cpanel-migrator-0.3.7.tar.gz"><strong>Descargar BladeCP cPanel Migrator (.tar.gz)</strong></a>
+  <a href="https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/bladecp-cpanel-migrator-0.3.8.tar.gz"><strong>Descargar BladeCP cPanel Migrator (.tar.gz)</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/bladecp/bladecp-cpanel/releases/tag/v0.3.7">Notas de la versión</a>
+  <a href="https://github.com/bladecp/bladecp-cpanel/releases/tag/v0.3.8">Notas de la versión</a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/SHA256SUMS">Suma de comprobación SHA-256</a>
+  <a href="https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/SHA256SUMS">Suma de comprobación SHA-256</a>
 </p>
 
 <p align="center">
@@ -43,7 +43,7 @@
 </p>
 
 > [!IMPORTANT]
-> **Versión preliminar `0.3.7`.** Es la primera versión pública. Instálala
+> **Versión preliminar `0.3.8`.** Instálala
 > primero en un servidor cPanel y WHM que no esté en producción y migra una
 > cuenta de prueba antes de llevar cuentas de clientes.
 
@@ -155,20 +155,23 @@ solo se lee y se archiva.
 
 ## Descargas y notas de la versión
 
-**`0.3.7`** es la primera versión pública. Se instala desde la release de
-GitHub, con un archivo determinista verificado por la suma de comprobación
-publicada, y el período gratuito predeterminado pasa a ser de 14 días, como se
-describe en el [changelog](CHANGELOG.md). Lee las notas de la versión antes de
+**`0.3.8`** convierte **Confirmar mi cuenta** en la app de cPanel en un
+enlace, para que los navegadores que aplican la política form-action a las
+redirecciones, como Chrome, ya no lo bloqueen, y refuerza la configuración de
+la API, la cola y el directorio de trabajo, como se describe en el
+[changelog](CHANGELOG.md). Se
+instala desde la release de GitHub, con un archivo determinista verificado por
+la suma de comprobación publicada. Lee las notas de la versión antes de
 actualizar.
 
 | Archivo | Propósito |
 | --- | --- |
-| [**bladecp-cpanel-migrator-0.3.7.tar.gz**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/bladecp-cpanel-migrator-0.3.7.tar.gz) | Paquete instalable, con `install.sh`, `uninstall.sh` y `plugin/` |
-| [**SHA256SUMS**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/SHA256SUMS) | Suma de comprobación para verificar la integridad del archivo |
-| [**bladecp-cpanel-migrator-0.3.7.tar.gz.sha256**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/bladecp-cpanel-migrator-0.3.7.tar.gz.sha256) | La misma suma, junto al nombre del archivo |
-| [**RELEASE_NOTES.md**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/RELEASE_NOTES.md) | Notas que acompañan este paquete |
+| [**bladecp-cpanel-migrator-0.3.8.tar.gz**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/bladecp-cpanel-migrator-0.3.8.tar.gz) | Paquete instalable, con `install.sh`, `uninstall.sh` y `plugin/` |
+| [**SHA256SUMS**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/SHA256SUMS) | Suma de comprobación para verificar la integridad del archivo |
+| [**bladecp-cpanel-migrator-0.3.8.tar.gz.sha256**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/bladecp-cpanel-migrator-0.3.8.tar.gz.sha256) | La misma suma, junto al nombre del archivo |
+| [**RELEASE_NOTES.md**](https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/RELEASE_NOTES.md) | Notas que acompañan este paquete |
 
-Consulta la [página de la release](https://github.com/bladecp/bladecp-cpanel/releases/tag/v0.3.7)
+Consulta la [página de la release](https://github.com/bladecp/bladecp-cpanel/releases/tag/v0.3.8)
 o [todas las releases de BladeCP cPanel Migrator](https://github.com/bladecp/bladecp-cpanel/releases).
 Los archivos automáticos **Source code** de GitHub contienen el repositorio;
 para instalar el plugin, usa el `.tar.gz` de la lista anterior.
@@ -188,7 +191,7 @@ para instalar el plugin, usa el `.tar.gz` de la lista anterior.
 | Cobro | Tu WHMCS de cobro con el addon de BladeCP |
 | Idiomas | Inglés, portugués (Brasil) y español, en WHM y en la app de cPanel |
 
-La versión `0.3.7` se validó en cPanel y WHM 11.138 con AlmaLinux 9 y el PHP
+La versión `0.3.8` se validó en cPanel y WHM 11.138 con AlmaLinux 9 y el PHP
 8.4 incluido en cPanel. Son entornos probados, no requisitos mínimos
 adicionales.
 
@@ -211,11 +214,11 @@ etapa de build.
    archivo y ejecuta el instalador:
 
    ```bash
-   curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/bladecp-cpanel-migrator-0.3.7.tar.gz
-   curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.7/SHA256SUMS
+   curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/bladecp-cpanel-migrator-0.3.8.tar.gz
+   curl -fLO https://github.com/bladecp/bladecp-cpanel/releases/download/v0.3.8/SHA256SUMS
    sha256sum -c SHA256SUMS
-   tar -xzf bladecp-cpanel-migrator-0.3.7.tar.gz
-   cd bladecp-cpanel-migrator-0.3.7
+   tar -xzf bladecp-cpanel-migrator-0.3.8.tar.gz
+   cd bladecp-cpanel-migrator-0.3.8
    ./install.sh
    ```
 
@@ -370,19 +373,19 @@ datos de clientes en un issue público.
 
 ## Calidad y validación
 
-La versión `0.3.7` fue validada por los mantenedores con **769 verificaciones
-automatizadas**: 649 verificaciones unitarias y de escenario de la cola, el
+La versión `0.3.8` fue validada por los mantenedores con **789 verificaciones
+automatizadas**: 668 verificaciones unitarias y de escenario de la cola, el
 worker, el envío, el cliente de la API, la configuración, las pantallas de WHM
 y de cPanel y la eliminación de secretos, 18 verificaciones en Perl del módulo
-UAPI y del AdminBin, 81 verificaciones de instalación y desinstalación en una
+UAPI y del AdminBin, 82 verificaciones de instalación y desinstalación en una
 raíz de sistema simulada y las 21 verificaciones públicas de regresión. La
 insignia de pruebas representa esa ejecución.
 
 Antes de generar el paquete, cada archivo PHP pasa una verificación de
 sintaxis y el árbol público se revisa en busca de credenciales y referencias no
-públicas. El archivo de la release se instaló después desde cero en un
-servidor cPanel y WHM 11.138, se conectó, se desinstaló sin residuos y se
-instaló de nuevo.
+públicas. El archivo de la release `0.3.8` se instaló después sobre la `0.3.7` y desde
+cero en un servidor cPanel y WHM 11.138, se conectó y se desinstaló sin
+residuos.
 
 Este repositorio incluye sus propias verificaciones de regresión
 (`tests/run.php`), las verificaciones de Perl y de instalación

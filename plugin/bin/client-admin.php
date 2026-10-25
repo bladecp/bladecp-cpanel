@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * BladeCP cPanel Migrator: root side of the cPanel app.
  *
- *   client-admin.php status|start|act --user=<account>   JSON request on stdin, JSON answer on stdout
+ *   client-admin.php status|start|act|claim --user=<account>   JSON request on stdin, JSON answer on stdout
  *
  * Run only by the AdminBin (/usr/local/cpanel/bin/admin/BladeCP/MigratorClient),
  * which cPanel starts as root with the UID of the logged-in account and

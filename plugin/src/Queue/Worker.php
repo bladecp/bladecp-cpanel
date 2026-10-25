@@ -214,6 +214,9 @@ final class Worker
         if ($account === null) {
             throw new SystemError(SystemError::ACCOUNT_NOT_FOUND, 'The cPanel account no longer exists on this server.');
         }
+        if (!JobState::sameAccount($job, is_int($account['started'] ?? null) ? $account['started'] : null)) {
+            throw new SystemError(SystemError::ACCOUNT_NOT_FOUND, 'The cPanel account of this migration was removed and created again.');
+        }
         $dir = $this->workDir->jobDir((string) $job['id']);
         $estimate = $account['disk_used_bytes'] ?? ($job['estimated_bytes'] ?? null);
         $required = is_int($estimate) ? $estimate + max(self::DISK_RESERVE, intdiv($estimate, 10)) : self::DISK_RESERVE;

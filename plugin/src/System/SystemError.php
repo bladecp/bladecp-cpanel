@@ -14,6 +14,7 @@ final class SystemError extends \RuntimeException
     public const BACKUP_ABORTED = 'backup_aborted';
     public const DISK_SPACE_LOW = 'disk_space_low';
     public const WORK_DIR_UNSAFE = 'work_dir_unsafe';
+    public const WORK_DIR_FOREIGN = 'work_dir_foreign';
 
     public function __construct(
         public readonly string $errorCode,

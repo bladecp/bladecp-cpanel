@@ -11,12 +11,13 @@ use BladeCP\CpanelMigrator\Store\FileStore;
 use BladeCP\CpanelMigrator\Support\Logger;
 
 /**
- * Name the cPanel app shows in place of the platform brand (white label).
+ * Partner name the cPanel app shows as a reference ("Partner: <name>").
+ * The app itself always carries the BladeCP brand.
  *
  * Order: the name saved in the WHM settings, then the public name of the
  * partner brand from the API (GET /customer/branding/assets, read with the
  * partner key and kept in the root-only cache), then nothing, and the app
- * shows a neutral text. The account-side code never calls the API: the
+ * shows no partner name. The account-side code never calls the API: the
  * worker refreshes the cache every few hours and the WHM connection test
  * refreshes it at once.
  */
@@ -27,7 +28,7 @@ final class Branding
     public const RETRY_AFTER = 1800;
     public const MAX_LENGTH = 60;
 
-    /** Brand name for the cPanel app, or null for the neutral text. */
+    /** Partner name for the cPanel app, or null to show none. */
     public static function name(Settings $settings, FileStore $store): ?string
     {
         $saved = self::clean($settings->clientBrandName());

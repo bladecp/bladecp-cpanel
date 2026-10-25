@@ -185,6 +185,7 @@ if errors:
     raise SystemExit(1)
 PY
 
+# shellcheck disable=SC2016 # The $ belong to the PHP code.
 php -r '
 require "plugin/src/bootstrap.php";
 foreach (["en", "pt-BR", "es"] as $locale) {

@@ -25,10 +25,15 @@ final class SettingsValidator
     private const FORBIDDEN_EXACT = ['/', '/home', '/root', '/var', '/opt', '/srv', '/backup', '/mnt', '/media'];
 
     /**
+     * Connection form. An empty key keeps the saved one, but never for
+     * another endpoint: when the API URL changes ($savedUrl is the URL in
+     * use), the key must be typed again in the same form, so the saved key is
+     * never sent to a host it was not typed for.
+     *
      * @param array<string,mixed> $input
      * @return array{0:array<string,mixed>,1:array<string,string>}
      */
-    public static function connection(array $input): array
+    public static function connection(array $input, ?string $savedUrl = null): array
     {
         $patch = [];
         $errors = [];
@@ -45,6 +50,12 @@ final class SettingsValidator
             $errors['api_base_url'] = $urlError;
         } else {
             $patch['api_base_url'] = $url;
+        }
+        if ($errors === [] && $savedUrl !== null && !isset($patch['api_key'])) {
+            $saved = rtrim(trim($savedUrl), '/');
+            if (($url === '' ? Client::DEFAULT_BASE_URL : $url) !== ($saved === '' ? Client::DEFAULT_BASE_URL : $saved)) {
+                $errors['api_key'] = 'settings.error.api_key_for_url';
+            }
         }
         return [$errors === [] ? $patch : [], $errors];
     }
